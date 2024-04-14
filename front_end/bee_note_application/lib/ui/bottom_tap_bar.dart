@@ -18,7 +18,7 @@ class CustomBottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 90,
+      height: 80,
       decoration: const BoxDecoration(
         boxShadow: [
           BoxShadow(
