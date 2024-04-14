@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-// import 'package:flutter/widgets.dart';
 
 class ProjectCard extends StatelessWidget {
 
@@ -28,16 +27,16 @@ class ProjectCard extends StatelessWidget {
 
   BoxDecoration _cardProjects() {
     return BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black38,
-            blurRadius: 10,
-            offset: Offset(0, 5)
-          )
-        ]
-      );
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(30),
+      boxShadow: const [
+        BoxShadow(
+          color: Colors.black38,
+          blurRadius: 10,
+          offset: Offset(0, 5)
+        )
+      ]
+    );
   }
 }
 
