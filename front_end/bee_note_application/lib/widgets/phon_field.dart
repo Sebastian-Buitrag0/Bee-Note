@@ -1,6 +1,9 @@
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:intl_phone_field/phone_number.dart';
 
 class MyPhoneFormField extends StatelessWidget {
 
@@ -9,7 +12,6 @@ class MyPhoneFormField extends StatelessWidget {
   final double paddingVertical;
 
   final Widget? suffixIcon;
-  final String? Function(String?)? validator;
 
   const MyPhoneFormField({
     super.key, 
@@ -17,7 +19,6 @@ class MyPhoneFormField extends StatelessWidget {
     required this.hintText, 
     this.paddingVertical = 5, 
     this.suffixIcon, 
-    this.validator
   });
 
   @override
@@ -43,20 +44,45 @@ class MyPhoneFormField extends StatelessWidget {
 
           controller: controller,
           initialCountryCode: 'CO', // Ajusta esto según sea necesario
-          // validator: validator,
+          showCountryFlag: false,
+          validator: _myPhoneNumberValidator,
           
+          dropdownTextStyle: const TextStyle(
+            fontFamily: 'Letters_for_Learners',
+            fontSize: 23,
+            color: Color.fromARGB(255, 130, 130, 130),
+          ),
+
+          
+          style: const TextStyle(
+            fontFamily: 'Letters_for_Learners',
+            fontSize: 30,
+            color: Color.fromARGB(255, 130, 130, 130),
+          ),
+
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: hintText,
             suffixIcon: suffixIcon,
           ),
           
-          onChanged: (phone) {
+          // onChanged: (phone) {
             // Maneja cambios en el número de teléfono
-            print('Nuevo número: ${phone.completeNumber}');
-          },
+            // print('Nuevo número: ${phone.completeNumber}');
+          // },
+
         ),
       ),
     );
+  }
+
+  FutureOr<String?> _myPhoneNumberValidator(PhoneNumber? phoneNumber){
+    if (phoneNumber == null || phoneNumber.number.isEmpty) {
+        return 'El campo no puede estar vacío';
+    } else if (!RegExp(r'^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$').hasMatch(phoneNumber.toString())) {
+        return 'Número de teléfono no válido';
+    }
+    // Retorna null si el número es válido
+    return null;
   }
 }
