@@ -1,4 +1,4 @@
-import 'package:bee_note_application/widgets/text_field.dart';
+import 'package:bee_note_application/widgets/widgsts.dart';
 import 'package:flutter/material.dart';
 
 class FormProyect extends StatefulWidget {
@@ -19,32 +19,96 @@ class _FormProyetcStaet extends State<FormProyect> {
       child: Column(
         children: [
           const SizedBox(height: 20,),
-          
-          MyTextField(
+
+          MyTextFormField(
             controller: projectNamwController, 
             hintText: 'Proyecto #', 
-            obscureText: false
+            obscureText: false,
+            paddingVertical: 0,
+            
           ),
 
-          const SizedBox(height: 10,),
+          _BuilTextDescription(
+            controller: descriptionController,
+          ),
 
-          _NewWidget()
+          _ParticipantButton(
+            onTap: () {
+              print('Funciona');
+            },
+          )
+
         ],
       ),
     );
   }
 }
 
-class _NewWidget extends StatelessWidget {
+class _ParticipantButton extends StatelessWidget {
+  final VoidCallback onTap;
+  
+  const _ParticipantButton({
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 25),
+      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 7.5),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30),
+            border: Border.all(color: Colors.white),
+            color: Colors.white,
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black12,
+                offset: Offset(0, 15),
+                blurRadius: 10,
+              ),
+            ],
+          ),
+          
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Agregar participantes',
+                style: TextStyle(
+                  fontFamily: 'Letters_for_Learners',
+                  fontSize: 30,
+                  color: Color.fromARGB(255, 130, 130, 130),
+                ),
+              ),
+
+              Icon(Icons.person_add_alt_sharp)
+            ],
+          ),
+
+        ),
+      ),
+    );
+  }
+}
+
+class _BuilTextDescription extends StatelessWidget {
+  final TextEditingController controller;
+
+  const _BuilTextDescription({
+    required this.controller
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 7.5),
       child: Container(
       
         width: double.infinity,
-        
         padding: const EdgeInsets.symmetric(horizontal: 25),
         
         decoration: BoxDecoration(
@@ -62,6 +126,7 @@ class _NewWidget extends StatelessWidget {
       
         child: TextFormField(
 
+          controller: controller,
           minLines: 1,
           maxLines: 4,
 
@@ -73,7 +138,7 @@ class _NewWidget extends StatelessWidget {
 
           decoration: const InputDecoration(
             border: InputBorder.none,
-            hintText: 'Des',
+            hintText: 'Descripcion',
           ),
         )
       ),

@@ -1,4 +1,3 @@
-import 'package:bee_note_application/widgets/phon_field.dart';
 import 'package:bee_note_application/widgets/widgsts.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -18,9 +17,14 @@ class _FormRegister1State extends State<FormRegister1> {
   final phoneTextController = TextEditingController();
   final birthdateTextController = TextEditingController();
 
+  final GlobalKey<FormState> _formState = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return Form(
+
+      key: _formState,
+
       autovalidateMode: AutovalidateMode.onUserInteraction,
       child: Column(
           children: [
@@ -72,12 +76,7 @@ class _FormRegister1State extends State<FormRegister1> {
             ),
 
             // Telefono
-            // MyTextFormField(
-            //   controller: phoneTextController, 
-            //   hintText: 'Telefono', 
-            //   obscureText: false,
-            //   paddingVertical: 0,
-            //   suffixIcon: const Icon(Icons.phone_android),
+
             //   validator: (value) {
             //     if(value!.isEmpty){
             //       return 'El campo no puede estar vacio';
@@ -85,8 +84,6 @@ class _FormRegister1State extends State<FormRegister1> {
             //       return 'Numero no valido';
             //     }
             //     return null;
-            //   },
-            // ),
             
             MyPhoneFormField(
               controller: phoneTextController, 
@@ -109,17 +106,29 @@ class _FormRegister1State extends State<FormRegister1> {
                   birthdateTextController.text = DateFormat('yyyy-MM-dd').format(selectedDate);
                 });
               },
+              validator: (value) {
+                return (value == null || value.isEmpty)
+                  ? 'El campo no puede estar vacio'
+                  : null;
+              },
             ),
       
             // Boton Siguiente
             const SizedBox(height: 30),
             HexagonalButton(
               onTap: (){
-                // Lógica para el evento de tap (Iniciar sesion)
-                Navigator.restorablePushNamed(context, 'register2');
+                // Lógica para el evento de tap (Siguiente)
+                // pr
+                if(_formState.currentState!.validate()){
+                  // print(_formState.currentState!.validate());
+                  Navigator.restorablePushNamed(context, 'register2');
+
+                }
+
               },
               text: 'Siguiente'
             ),
+            const SizedBox(height: 30),
           ],
         ),
     );
