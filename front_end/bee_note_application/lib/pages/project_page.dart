@@ -19,7 +19,7 @@ class ProjectScreen extends StatelessWidget {
         ),
         title: const Center(
           child: Text(
-            'Crear proyecto',
+            'Crear/editar proyecto',
             style: TextStyle(
               fontFamily: 'Letters_for_Learners', 
               fontSize: 40, 
