@@ -28,6 +28,7 @@ class _RegisterPage1State extends State<RegisterPage1> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  const SizedBox(height: 20,),
                   // Logo
                   SizedBox(
                     height: 200,
