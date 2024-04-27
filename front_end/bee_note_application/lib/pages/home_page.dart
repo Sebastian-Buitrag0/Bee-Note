@@ -70,7 +70,8 @@ class _HomePageState extends State<HomePage> {
       body: ListView.builder(
         itemCount: 10,
         itemBuilder: (BuildContext context,int index) => GestureDetector(
-          onTap: () => Navigator.pushNamed(context, 'project'),
+          // todo: OnTap function
+          onTap: () => Navigator.pushNamed(context, 'task'),
           child: ProjectCard()
         ),
       ),
@@ -92,6 +93,7 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: HexagonalButton(
         onTap: () {
           // Lógica para el botón hexagonal
+          Navigator.pushNamed(context, 'project');
         },
         iconData: Icons.add,
         sizewidth: 90,
