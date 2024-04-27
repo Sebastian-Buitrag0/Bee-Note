@@ -1,5 +1,5 @@
+import 'package:bee_note_application/routes/routes.dart';
 import 'package:flutter/material.dart';
-import 'package:bee_note_application/pages/screens.dart';
 
 void main() => runApp(const MyApp());
 
@@ -11,14 +11,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       // home: LoginPage(),
-      initialRoute: 'home',
-      routes: {
-        'login': ( _ ) => const LoginPage(),
-        'register1': ( _ ) => const RegisterPage1(),
-        'register2': ( _ ) => const RegisterPage2(),
-        'home': ( _ ) => const HomePage(),
-        'project': ( _ ) => const ProjectScreen(),
-      },
+      initialRoute: 'login',
+      routes: appRoutes,
     );
   }
 }
