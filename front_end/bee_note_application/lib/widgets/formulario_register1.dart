@@ -1,5 +1,6 @@
-import 'package:bee_note_application/widgets/widgsts.dart';
 import 'package:flutter/material.dart';
+
+import 'package:bee_note_application/widgets/widgsts.dart';
 import 'package:intl/intl.dart';
 
 class FormRegister1 extends StatefulWidget {
@@ -76,15 +77,6 @@ class _FormRegister1State extends State<FormRegister1> {
             ),
 
             // Telefono
-
-            //   validator: (value) {
-            //     if(value!.isEmpty){
-            //       return 'El campo no puede estar vacio';
-            //     }else if(!RegExp(r'^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$').hasMatch(value)){
-            //       return 'Numero no valido';
-            //     }
-            //     return null;
-            
             MyPhoneFormField(
               controller: phoneTextController, 
               hintText: 'Telefono',
