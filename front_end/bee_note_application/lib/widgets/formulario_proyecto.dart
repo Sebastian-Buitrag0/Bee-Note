@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
 
-import 'package:bee_note_application/widgets/widgsts.dart';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:bee_note_application/widgets/widgsts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 
 class FormProyect extends StatefulWidget {
-  const FormProyect({super.key});
+
+  final String name;
+  final bool showMyTextFormField;
+
+  const FormProyect({
+    super.key, 
+    required this.name, 
+    this.showMyTextFormField = false
+  });
 
   @override
   State<FormProyect> createState() => _FormProyetcStaet();
@@ -17,6 +26,8 @@ class _FormProyetcStaet extends State<FormProyect> {
 
   final projectNamwController = TextEditingController();
   final descriptionController = TextEditingController();
+  final starDateController = TextEditingController();
+  final endDateController = TextEditingController();
 
   Uint8List? _image;
   File? selectedImage;
@@ -28,22 +39,32 @@ class _FormProyetcStaet extends State<FormProyect> {
         children: [
           const SizedBox(height: 20,),
 
+          // Nombre de proyecto
           MyTextFormField(
             controller: projectNamwController, 
-            hintText: 'Proyecto #', 
+            hintText: widget.name, 
             obscureText: false,
             paddingVertical: 0,
             
           ),
 
+          // descripcion
           _BuilTextDescription(
             controller: descriptionController,
           ),
 
+          // Agregar participantes
           _ParticipantButton(
             onTap: () => Navigator.pushNamed(context, 'collaborator'),
           ),
 
+          _BuildSelectedDate(
+            starDateController: starDateController,
+            endDateController: endDateController,
+            showDateField: widget.showMyTextFormField,
+          ),
+
+          // cargar imagen
           _BuildSelectedImage(
             onTapContainer: () => showImagePckerOption(context),
             onTapText: () => showImagePckerOption(context),
@@ -144,6 +165,75 @@ class _FormProyetcStaet extends State<FormProyect> {
       _image = File(returnImage.path).readAsBytesSync();
     });
     Navigator.of(context).pop();
+  }
+}
+
+class _BuildSelectedDate extends StatelessWidget {
+  final bool showDateField;
+  final TextEditingController starDateController;
+  final TextEditingController endDateController;
+
+  const _BuildSelectedDate({
+    required this.showDateField,
+    required this.starDateController, 
+    required this.endDateController,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Builder(
+      builder: (BuildContext context) {
+        if (showDateField) {
+          return Column(
+            children: [
+              MyTextFormField(
+                controller: starDateController,
+                hintText: 'Inicio de la tarea',
+                obscureText: false,
+                paddingVertical: 0,
+                suffixIcon: const Icon(Icons.calendar_today_outlined),
+                readOnly: true,
+                showDate: true,
+                initialDate: DateTime.now(),
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2100),
+                onDateSelected: (DateTime selectedDate) {
+                  starDateController.text = DateFormat('yyyy-MM-dd').format(selectedDate);
+                },
+                validator: (value) {
+                  return (value == null || value.isEmpty)
+                      ? 'El campo no puede estar vacio'
+                      : null;
+                },
+              ),
+
+              MyTextFormField(
+                controller: endDateController,
+                hintText: 'Cierre de la tarea',
+                obscureText: false,
+                paddingVertical: 0,
+                suffixIcon: const Icon(Icons.calendar_today_outlined),
+                readOnly: true,
+                showDate: true,
+                initialDate: DateTime.now(),
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2100),
+                onDateSelected: (DateTime selectedDate) {
+                  starDateController.text = DateFormat('yyyy-MM-dd').format(selectedDate);
+                },
+                validator: (value) {
+                  return (value == null || value.isEmpty)
+                      ? 'El campo no puede estar vacio'
+                      : null;
+                },
+              ),
+            ],
+          );
+        } else {
+          return Container();
+        }
+      },
+    );
   }
 }
 
