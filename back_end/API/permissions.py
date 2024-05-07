@@ -1,13 +1,7 @@
-from rest_framework import permissions
+from rest_framework.permissions import BasePermission, SAFE_METHODS
 
-class IsOwnerOrReadOnly(permissions.BasePermission):
-    """
-    Permite a los propietarios de un objeto editar ese objeto.
-    """
-    def has_object_permission(self, request, view, obj):
-        # Permisos de lectura permitidos para cualquier solicitud
-        if request.method in permissions.SAFE_METHODS:
+class IsAuthenticatedOrCreateOnly(BasePermission):
+    def has_permission(self, request, view):
+        if request.method == 'POST':
             return True
-
-        # Los propietarios del objeto tienen permiso de escritura
-        return obj.user == request.user
+        return request.user.is_authenticated

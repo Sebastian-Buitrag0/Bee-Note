@@ -2,63 +2,8 @@ from .models import Persona, Usuario, Registro, Rol, Proyecto, Tarea, Recurso, E
 from .serializers import RegistroUsuarioSerializer,PersonaSerializer, UsuarioSerializer, RegistroSerializer, RolSerializer, ProyectoSerializer, TareaSerializer, RecursoSerializer, EstadoSerializer, TipoSerializer, PrioridadSerializer, UsuariosRegistroSerializer, RecursoProyectoSerializer, RecursoTareaSerializer, UsuarioTareaSerializer, RolUsuarioProyectoSerializer
 from rest_framework import viewsets, generics
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from django.contrib.auth.models import Permission
+from rest_framework.exceptions import PermissionDenied
 
-
-@api_view(['POST'])
-def crear_roles(request):
-    roles = [
-        {
-            'nombre': 'Creador',
-            'descripcion': 'Rol de creador',
-            'permisos': [
-                'api.add_proyecto', 'api.change_proyecto', 'api.delete_proyecto', 'api.view_proyecto',
-                'api.add_tarea', 'api.change_tarea', 'api.delete_tarea', 'api.view_tarea',
-                'api.add_recurso', 'api.change_recurso', 'api.delete_recurso', 'api.view_recurso',
-                'api.add_rolusuarioproyecto', 'api.delete_rolusuarioproyecto', 'api.view_rolusuarioproyecto',
-                'api.add_usuariotarea', 'api.delete_usuariotarea', 'api.view_usuariotarea',
-            ]
-        },
-        {
-            'nombre': 'Moderador',
-            'descripcion': 'Rol de moderador',
-            'permisos': [
-                'api.view_proyecto',
-                'api.add_tarea', 'api.change_tarea', 'api.delete_tarea', 'api.view_tarea',
-                'api.add_recurso', 'api.change_recurso', 'api.delete_recurso', 'api.view_recurso',
-                'api.add_rolusuarioproyecto', 'api.delete_rolusuarioproyecto', 'api.view_rolusuarioproyecto',
-                'api.add_usuariotarea', 'api.delete_usuariotarea', 'api.view_usuariotarea',
-            ]
-        },
-        {
-            'nombre': 'Colaborador',
-            'descripcion': 'Rol de colaborador',
-            'permisos': [
-                'api.view_proyecto',
-                'api.add_tarea', 'api.change_tarea', 'api.delete_tarea', 'api.view_tarea',
-                'api.add_recurso', 'api.change_recurso', 'api.delete_recurso', 'api.view_recurso',
-                'api.add_usuariotarea', 'api.delete_usuariotarea', 'api.view_usuariotarea',
-            ]
-        },
-        {
-            'nombre': 'Visualizador',
-            'descripcion': 'Rol de visualizador',
-            'permisos': [
-                'api.view_proyecto',
-                'api.view_tarea',
-                'api.view_recurso',
-            ]
-        }
-    ]
-
-    for rol_data in roles:
-        rol = Rol.objects.create(nombre=rol_data['nombre'], descripcion=rol_data['descripcion'])
-        permisos = Permission.objects.filter(codename__in=rol_data['permisos'])
-        rol.permisos.set(permisos)
-
-    return Response({'message': 'Roles creados exitosamente'})
 
 
 
@@ -77,6 +22,14 @@ class UsuarioViewSet(viewsets.ModelViewSet):
     ]
     serializer_class = UsuarioSerializer
 
+    def get_queryset(self):
+        usuario = self.request.user
+        user = Usuario.objects.filter(id=usuario.id)
+        return user
+    
+    
+    
+    
 class RegistroViewSet(viewsets.ModelViewSet):
     queryset = Registro.objects.all()
     permission_classes = [
@@ -93,12 +46,34 @@ class RolViewSet(viewsets.ModelViewSet):
 
 class ProyectoViewSet(viewsets.ModelViewSet):
     queryset = Proyecto.objects.all()
-    permission_classes = [IsAuthenticated]
     serializer_class = ProyectoSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         usuario = self.request.user
-        return Proyecto.objects.filter(rolusuarioproyecto__idUsuario=usuario)
+        proyectos_asociados = Proyecto.objects.filter(rolusuarioproyecto__idUsuario=usuario)
+        return proyectos_asociados
+
+    def perform_create(self, serializer):
+        proyecto = serializer.save()
+        usuario = self.request.user
+        rol_creador = Rol.objects.get(id=1)
+        if not RolUsuarioProyecto.objects.filter(idUsuario=usuario, idProyecto=proyecto).exists():
+            RolUsuarioProyecto.objects.create(idRol=rol_creador, idUsuario=usuario, idProyecto=proyecto)
+
+    def perform_update(self, serializer):
+        proyecto = self.get_object()
+        print(self.request.user.has_perm('change_proyecto', proyecto))
+        if self.request.user.has_perm('api.change_proyecto', proyecto):
+            serializer.save()
+        else:
+            raise PermissionDenied('No tienes permiso para editar este proyecto')
+
+    def perform_destroy(self, instance):
+        if self.request.user.has_perm('api.delete_proyecto', instance):
+            instance.delete()
+        else:
+            raise PermissionDenied('No tienes permiso para eliminar este proyecto')
 
 class TareaViewSet(viewsets.ModelViewSet):
     queryset = Tarea.objects.all()

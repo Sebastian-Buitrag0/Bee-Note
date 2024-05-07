@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Tipo, Prioridad, Estado, Persona, Usuario, Registro, Rol, Proyecto, Tarea, Recurso, UsuariosRegistro, RecursoProyecto, RecursoTarea, UsuarioTarea, RolUsuarioProyecto
+from .models import Tipo, Prioridad, Estado, Persona, Usuario, Registro, Rol, RolPermiso, Proyecto, Tarea, Recurso, UsuariosRegistro, RecursoProyecto, RecursoTarea, UsuarioTarea, RolUsuarioProyecto
 
 # Register your models here.
 admin.site.register(Persona)
@@ -17,3 +17,4 @@ admin.site.register(RecursoProyecto)
 admin.site.register(RecursoTarea)
 admin.site.register(UsuarioTarea)
 admin.site.register(RolUsuarioProyecto)
+admin.site.register(RolPermiso)
