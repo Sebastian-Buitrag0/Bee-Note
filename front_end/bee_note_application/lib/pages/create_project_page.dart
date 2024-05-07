@@ -1,8 +1,8 @@
 import 'package:bee_note_application/widgets/formulario_proyecto.dart';
 import 'package:flutter/material.dart';
 
-class ProjectScreen extends StatelessWidget {
-  const ProjectScreen({super.key});
+class CreateProjectScreen extends StatelessWidget {
+  const CreateProjectScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,22 +17,21 @@ class ProjectScreen extends StatelessWidget {
           color: Colors.white,
           size: 45,
         ),
-        title: const Center(
-          child: Text(
-            'Crear/editar proyecto',
-            style: TextStyle(
-              fontFamily: 'Letters_for_Learners', 
-              fontSize: 40, 
-              color: Colors.white,
-            ),
+        title: const Text(
+          'Crear proyecto',
+          style: TextStyle(
+            fontFamily: 'Letters_for_Learners', 
+            fontSize: 40, 
+            color: Colors.white,
           ),
         ),
+        centerTitle: true,
       ),
 
       body: const SingleChildScrollView(
         child: Column(
           children: [
-            FormProyect()
+            FormProyect(name: 'Nombre de proyecto',)
           ],
         ),
       ) 
