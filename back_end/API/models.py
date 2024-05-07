@@ -1,6 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Permission
 
 class Persona(models.Model):
     id = models.AutoField(primary_key=True)
@@ -13,19 +12,43 @@ class Persona(models.Model):
     def __str__(self):
         return self.nombre+' '+self.apellido
 
+class UsuarioManager(BaseUserManager):
+    def create_user(self, nombreUsuario, password=None, **extra_fields):
+        if not nombreUsuario:
+            raise ValueError('El nombre de usuario es obligatorio')
+        user = self.model(nombreUsuario=nombreUsuario, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
 
-class Usuario(AbstractBaseUser):
+    def create_superuser(self, nombreUsuario, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+    
+    # Crear una instancia de Persona para asociarla al superusuario
+        persona = Persona.objects.create(nombre='Admin', apellido='Admin', fechaNacimiento='1990-01-01', telefono='1234567890', correo='admin@example.com')
+    
+    # Asociar la instancia de Persona al superusuario
+        extra_fields['datosPersonales'] = persona
+    
+        return self.create_user(nombreUsuario, password, **extra_fields)
+    
+class Usuario(AbstractBaseUser, PermissionsMixin):
     id = models.AutoField(primary_key=True)
     nombreUsuario = models.CharField(max_length=64, unique=True, null=False, blank=False)
     estado = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
     datosPersonales = models.ForeignKey(Persona, on_delete=models.CASCADE)
 
     USERNAME_FIELD = 'nombreUsuario'
 
-    objects = BaseUserManager()
+    objects = UsuarioManager()
 
     def __str__(self):
         return self.nombreUsuario
+    
+
 
 class Tipo(models.Model):
     id = models.AutoField(primary_key=True)
@@ -44,18 +67,11 @@ class Registro(models.Model):
     def __str__(self):
         return self.tipo+' -> '+self.entidadAfectada
 
-class Permiso(models.Model):
-    id = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=64)
-
-    def __str__(self):
-        return self.nombre
-
-
 class Rol(models.Model):
     id = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=32)
     descripcion = models.CharField(max_length=256)
+    permisos = models.ManyToManyField(Permission)
 
     def __str__(self):
         return self.nombre
@@ -123,15 +139,6 @@ class UsuariosRegistro(models.Model):
     def __str__(self):
         return self.idUsuario.nombreUsuario+' -> '+self.idRegistro.tipo
 
-class RolPermiso(models.Model):
-    id = models.AutoField(primary_key=True)
-    idRol = models.ForeignKey(Rol, on_delete=models.CASCADE)
-    idPermiso = models.ForeignKey(Permiso, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.idRol.nombre+' -> '+self.idPermiso.tipo
-
-
 class RecursoProyecto(models.Model):
     id = models.AutoField(primary_key=True)
     idRecurso = models.ForeignKey(Recurso, on_delete=models.CASCADE)
@@ -149,14 +156,6 @@ class RecursoTarea(models.Model):
     def __str__(self):
         return self.idRecurso.nombre+' -> '+self.idTarea.nombre
 
-class UsuarioTarea(models.Model):
-    id = models.AutoField(primary_key=True)
-    idUsuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    idTarea = models.ForeignKey(Tarea, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.idUsuario.nombreUsuario+' -> '+self.idTarea.nombre
-
 class RolUsuarioProyecto(models.Model):
     id = models.AutoField(primary_key=True)
     idRol = models.ForeignKey(Rol, on_delete=models.CASCADE)
@@ -165,4 +164,11 @@ class RolUsuarioProyecto(models.Model):
 
     def __str__(self):
         return self.idRol.nombre+' - '+self.idUsuario.nombreUsuario+' - '+self.idProyecto.nombre
+     
+class UsuarioTarea(models.Model):
+    id = models.AutoField(primary_key=True)
+    idUsuario = models.ForeignKey(RolUsuarioProyecto, on_delete=models.CASCADE)
+    idTarea = models.ForeignKey(Tarea, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.idUsuario.nombreUsuario+' -> '+self.idTarea.nombre

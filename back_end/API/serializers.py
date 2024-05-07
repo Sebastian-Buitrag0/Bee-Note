@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password
-from .models import Tipo, Prioridad, Estado, Persona, Usuario, Registro, Permiso, Rol, Proyecto, Tarea, Recurso, UsuariosRegistro, RolPermiso, RecursoProyecto, RecursoTarea, UsuarioTarea, RolUsuarioProyecto
+from .models import Tipo, Prioridad, Estado, Persona, Usuario, Registro, Rol, Proyecto, Tarea, Recurso, UsuariosRegistro, RecursoProyecto, RecursoTarea, UsuarioTarea, RolUsuarioProyecto
 
 class PersonaSerializer(serializers.ModelSerializer):
     class Meta:
@@ -42,12 +42,6 @@ class RegistroSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ('id','fechaCreacion',)
 
-class PermisoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Permiso
-        fields = '__all__'
-        read_only_fields = ('id','nombre',)
-
 class RolSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rol
@@ -55,11 +49,18 @@ class RolSerializer(serializers.ModelSerializer):
         read_only_fields = ('id','nombre','descripcion',)
 
 class ProyectoSerializer(serializers.ModelSerializer):
-    estado = EstadoSerializer(many=False, read_only=True)
+    estado = serializers.PrimaryKeyRelatedField(queryset=Estado.objects.all())
     class Meta:
         model = Proyecto
         fields = '__all__'
         read_only_fields = ('id','fechaCreacion',)
+    
+    def create(self, validated_data):
+        proyecto = super().create(validated_data)
+        usuario = self.context['request'].user
+        rol_creador = Rol.objects.get(id=1) 
+        RolUsuarioProyecto.objects.create(idRol=rol_creador, idUsuario=usuario, idProyecto=proyecto)
+        return proyecto
 
 class TareaSerializer(serializers.ModelSerializer):
     idProyecto = ProyectoSerializer(many=False, read_only=True)
@@ -82,13 +83,6 @@ class UsuariosRegistroSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ('id','idUsuario','idRegistro',)
 
-class RolPermisoSerializer(serializers.ModelSerializer):
-    idRol = RolSerializer(many=False, read_only=True)
-    idPermiso = PermisoSerializer(many=False, read_only=True)
-    class Meta:
-        model = RolPermiso
-        fields = '__all__'
-        read_only_fields = ('id','idRol','idPermiso',)
 
 class RecursoProyectoSerializer(serializers.ModelSerializer):
     idProyecto = ProyectoSerializer(many=False, read_only=True)
@@ -122,3 +116,19 @@ class RolUsuarioProyectoSerializer(serializers.ModelSerializer):
         model = RolUsuarioProyecto
         fields = '__all__'
         read_only_fields = ('id','idProyecto','idRol','idUsuario',)
+
+class RegistroUsuarioSerializer(serializers.ModelSerializer):
+    datosPersonales = PersonaSerializer()
+
+    class Meta:
+        model = Usuario
+        fields = ['nombreUsuario', 'password', 'datosPersonales']
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def create(self, validated_data):
+        datos_personales = validated_data.pop('datosPersonales')
+        persona = Persona.objects.create(**datos_personales)
+        usuario = Usuario.objects.create(datosPersonales=persona, **validated_data)
+        usuario.set_password(validated_data['password'])
+        usuario.save()
+        return usuario
