@@ -8,8 +8,13 @@ class MyTextFormField extends StatelessWidget {
   final bool obscureText;
   final bool readOnly;
   final bool showDate;
+  
   final Function(DateTime)? onDateSelected;
+  final DateTime? initialDate;
+  final DateTime? firstDate;
+  final DateTime? lastDate;
   final String? Function(String?)? validator;
+
   final Widget? suffixIcon;
 
   const MyTextFormField({
@@ -22,7 +27,10 @@ class MyTextFormField extends StatelessWidget {
     this.suffixIcon, 
     this.showDate = false, 
     this.onDateSelected, 
-    this.validator
+    this.validator, 
+    this.initialDate, 
+    this.firstDate, 
+    this.lastDate
   });
 
   @override
@@ -91,9 +99,9 @@ class MyTextFormField extends StatelessWidget {
         onTap: () async {
           final selectedDate = await showDatePicker(
             context: context,
-            initialDate: DateTime.now(),
-            firstDate: DateTime(1900),
-            lastDate: DateTime.now(),
+            initialDate: initialDate ?? DateTime.now(),
+            firstDate: firstDate ?? DateTime(1900),
+            lastDate: lastDate ?? DateTime.now(),
           );
 
           if (selectedDate != null && onDateSelected != null) {

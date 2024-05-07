@@ -1,23 +1,33 @@
+import 'package:bee_note_application/data/project.dart';
 import 'package:flutter/material.dart';
 
 class ProjectCard extends StatelessWidget {
+  final Project project;
+
+  const ProjectCard({
+    super.key, 
+    required this.project
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
-        margin: const EdgeInsets.only(top: 40, ),
+
         width: double.infinity,
+        margin: const EdgeInsets.symmetric(vertical: 20),
         height: 300,
+        
         decoration: _cardProjects(),
+        
         child: Stack(
           alignment: Alignment.bottomLeft,
           children: [
 
-            _BackgroundImage(),
+            _BackgroundImage(image: project.image,),
 
-            _ProjectDetails()
+            _ProjectDetails(project: project,)
 
           ],
         ),
@@ -41,6 +51,11 @@ class ProjectCard extends StatelessWidget {
 }
 
 class _ProjectDetails extends StatelessWidget {
+  final Project project;
+
+  const _ProjectDetails({
+    required this.project
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -50,15 +65,17 @@ class _ProjectDetails extends StatelessWidget {
       height: 90,
       decoration: _buidBoxDecoration(),
       
-      child: const FittedBox(
+      child: FittedBox(
         fit: BoxFit.contain,
         alignment: Alignment.topLeft,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Nombre de proyectos #', 
-              style: TextStyle(
+              // 'Nombre de proyectos #',
+              project.name,
+
+              style: const TextStyle(
                 fontFamily: 'Letters_for_Learners',
                 color: Colors.white,
                 fontSize: 30
@@ -66,7 +83,7 @@ class _ProjectDetails extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            Row(
+            const Row(
               children: [
                 Icon(Icons.calendar_today_outlined, color: Colors.white, size: 20,),
                 SizedBox(width: 5,),
@@ -95,17 +112,22 @@ class _ProjectDetails extends StatelessWidget {
 }
 
 class _BackgroundImage extends StatelessWidget {
+  final String image;
+
+  const _BackgroundImage({
+    required this.image
+  });
 
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(30),
-      child: const SizedBox(
+      child: SizedBox(
         width: double.infinity,
         height: 300,
         child: FadeInImage(
-          placeholder: AssetImage('assets/img/loading.gif'),
-          image: AssetImage('assets/img/no_image.png'),
+          placeholder: const AssetImage('assets/img/loading.gif'),
+          image: AssetImage(image),
           fit: BoxFit.cover,
         ),
       ),
