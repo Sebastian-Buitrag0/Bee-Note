@@ -1,5 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Permission
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group
+
 
 class Persona(models.Model):
     id = models.AutoField(primary_key=True)
@@ -33,7 +34,7 @@ class UsuarioManager(BaseUserManager):
     
         return self.create_user(nombreUsuario, password, **extra_fields)
     
-class Usuario(AbstractBaseUser, PermissionsMixin):
+class Usuario(AbstractBaseUser,PermissionsMixin):
     id = models.AutoField(primary_key=True)
     nombreUsuario = models.CharField(max_length=64, unique=True, null=False, blank=False)
     estado = models.BooleanField(default=True)
@@ -66,16 +67,6 @@ class Registro(models.Model):
 
     def __str__(self):
         return self.tipo+' -> '+self.entidadAfectada
-
-
-class Rol(models.Model):
-    id = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=32)
-    descripcion = models.CharField(max_length=256)
-
-    def __str__(self):
-        return self.nombre
-
 class Estado(models.Model):
     id = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=32)
@@ -117,6 +108,7 @@ class Proyecto(models.Model):
     def __str__(self):
         return self.nombre
     
+
 class Tarea(models.Model):
     id = models.AutoField(primary_key=True)
     idProyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE)
@@ -139,14 +131,6 @@ class UsuariosRegistro(models.Model):
     def __str__(self):
         return self.idUsuario.nombreUsuario+' -> '+self.idRegistro.tipo
 
-class RolPermiso(models.Model):
-    id = models.AutoField(primary_key=True)
-    idRol = models.ForeignKey(Rol, on_delete=models.CASCADE)
-    idPermiso = models.ForeignKey(Permission, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.idRol.nombre+' -> '+self.idPermiso.codename
-
 
 class RecursoProyecto(models.Model):
     id = models.AutoField(primary_key=True)
@@ -165,18 +149,18 @@ class RecursoTarea(models.Model):
     def __str__(self):
         return self.idRecurso.nombre+' -> '+self.idTarea.nombre
 
-class RolUsuarioProyecto(models.Model):
+class GroupUsuarioProyecto(models.Model):
     id = models.AutoField(primary_key=True)
-    idRol = models.ForeignKey(Rol, on_delete=models.CASCADE)
+    idGroup = models.ForeignKey(Group, on_delete=models.CASCADE,null=True)
     idUsuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     idProyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.idRol.nombre+' - '+self.idUsuario.nombreUsuario+' - '+self.idProyecto.nombre
+        return self.idGroup.name+' - '+self.idUsuario.nombreUsuario+' - '+self.idProyecto.nombre
      
 class UsuarioTarea(models.Model):
     id = models.AutoField(primary_key=True)
-    idUsuario = models.ForeignKey(RolUsuarioProyecto, on_delete=models.CASCADE)
+    idUsuario = models.ForeignKey(GroupUsuarioProyecto, on_delete=models.CASCADE)
     idTarea = models.ForeignKey(Tarea, on_delete=models.CASCADE)
 
     def __str__(self):

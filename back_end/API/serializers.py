@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password
-from .models import Tipo, Prioridad, Estado, Persona, Usuario, Registro, Rol, Proyecto, Tarea, Recurso, UsuariosRegistro, RecursoProyecto, RecursoTarea, UsuarioTarea, RolUsuarioProyecto
+from django.contrib.auth.models import Group
+from .models import Tipo, Prioridad, Estado, Persona, Usuario, Registro, Proyecto, Tarea, Recurso, UsuariosRegistro, RecursoProyecto, RecursoTarea, UsuarioTarea, GroupUsuarioProyecto
 
 class PersonaSerializer(serializers.ModelSerializer):
     class Meta:
@@ -42,11 +43,11 @@ class RegistroSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ('id','fechaCreacion',)
 
-class RolSerializer(serializers.ModelSerializer):
+class GroupSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Rol
+        model = Group
         fields = '__all__'
-        read_only_fields = ('id','nombre','descripcion',)
+        read_only_fields = ('id','name','descripcion',)
 
 class ProyectoSerializer(serializers.ModelSerializer):
     estado = serializers.PrimaryKeyRelatedField(queryset=Estado.objects.all())
@@ -54,13 +55,6 @@ class ProyectoSerializer(serializers.ModelSerializer):
         model = Proyecto
         fields = '__all__'
         read_only_fields = ('id','fechaCreacion',)
-    
-    def create(self, validated_data):
-        proyecto = super().create(validated_data)
-        usuario = self.context['request'].user
-        rol_creador = Rol.objects.get(id=1) 
-        RolUsuarioProyecto.objects.create(idRol=rol_creador, idUsuario=usuario, idProyecto=proyecto)
-        return proyecto
 
 class TareaSerializer(serializers.ModelSerializer):
     idProyecto = ProyectoSerializer(many=False, read_only=True)
@@ -76,6 +70,8 @@ class RecursoSerializer(serializers.ModelSerializer):
         model = Recurso
         fields = '__all__'
         read_only_fields = ('id','fechaSubida','tamaño','contribuidor','link','tipo',)
+
+
 
 class UsuariosRegistroSerializer(serializers.ModelSerializer):
     class Meta:
@@ -108,14 +104,14 @@ class UsuarioTareaSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ('id','idTarea','idUsuario',)
 
-class RolUsuarioProyectoSerializer(serializers.ModelSerializer):
+class GroupUsuarioProyectoSerializer(serializers.ModelSerializer):
     idProyecto = ProyectoSerializer(many=False, read_only=True)
-    idRol = RolSerializer(many=False, read_only=True)
+    idGroup = GroupSerializer(many=False, read_only=True)
     idUsuario = UsuarioSerializer(many=False, read_only=True)
     class Meta:
-        model = RolUsuarioProyecto
+        model = GroupUsuarioProyecto
         fields = '__all__'
-        read_only_fields = ('id','idProyecto','idRol','idUsuario',)
+        read_only_fields = ('id','idProyecto','idGroup','idUsuario',)
 
 class RegistroUsuarioSerializer(serializers.ModelSerializer):
     datosPersonales = PersonaSerializer()
@@ -132,3 +128,4 @@ class RegistroUsuarioSerializer(serializers.ModelSerializer):
         usuario.set_password(validated_data['password'])
         usuario.save()
         return usuario
+    
