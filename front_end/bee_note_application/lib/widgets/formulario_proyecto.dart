@@ -107,18 +107,14 @@ class _FormProyetcStaet extends State<FormProyect> {
           builder: (context) => AlertDialog(
             title: Text('Error'),
             content: Text('Ocurrió un error al crear el proyecto. Por favor, inténtalo de nuevo.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text('OK'),
-              ),
-            ],
           ),
         );
       }
     }
+    Navigator.pop(context);
   },
   text: 'Guardar',
+  
 ),
 
           const SizedBox(height: 20,),
