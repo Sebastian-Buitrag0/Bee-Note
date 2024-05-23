@@ -2,11 +2,11 @@ import 'package:bee_note_application/data/project.dart';
 import 'package:flutter/material.dart';
 
 class ProjectCard extends StatelessWidget {
-  final Project project;
+  final Proyecto project;
 
   const ProjectCard({
-    super.key, 
-    required this.project
+    super.key,
+    required this.project,
   });
 
   @override
@@ -14,21 +14,19 @@ class ProjectCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
-
         width: double.infinity,
         margin: const EdgeInsets.symmetric(vertical: 20),
         height: 300,
-        
         decoration: _cardProjects(),
-        
         child: Stack(
           alignment: Alignment.bottomLeft,
           children: [
-
-            _BackgroundImage(image: project.image,),
-
-            _ProjectDetails(project: project,)
-
+            _BackgroundImage(
+              image: "null",
+            ),
+            _ProjectDetails(
+              project: project,
+            ),
           ],
         ),
       ),
@@ -43,18 +41,18 @@ class ProjectCard extends StatelessWidget {
         BoxShadow(
           color: Colors.black38,
           blurRadius: 10,
-          offset: Offset(0, 5)
-        )
-      ]
+          offset: Offset(0, 5),
+        ),
+      ],
     );
   }
 }
 
 class _ProjectDetails extends StatelessWidget {
-  final Project project;
+  final Proyecto project;
 
   const _ProjectDetails({
-    required this.project
+    required this.project,
   });
 
   @override
@@ -63,8 +61,7 @@ class _ProjectDetails extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
       width: double.infinity,
       height: 90,
-      decoration: _buidBoxDecoration(),
-      
+      decoration: _buildBoxDecoration(),
       child: FittedBox(
         fit: BoxFit.contain,
         alignment: Alignment.topLeft,
@@ -72,50 +69,55 @@ class _ProjectDetails extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              // 'Nombre de proyectos #',
-              project.name,
-
+              project.nombre,
               style: const TextStyle(
                 fontFamily: 'Letters_for_Learners',
                 color: Colors.white,
-                fontSize: 30
+                fontSize: 30,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
             const Row(
               children: [
-                Icon(Icons.calendar_today_outlined, color: Colors.white, size: 20,),
-                SizedBox(width: 5,),
+                Icon(
+                  Icons.calendar_today_outlined,
+                  color: Colors.white,
+                  size: 20,
+                ),
+                SizedBox(
+                  width: 5,
+                ),
                 Text(
                   '02/06/2055',
                   style: TextStyle(
                     fontFamily: 'Letters_for_Learners',
                     color: Colors.white,
-                    fontSize: 20
+                    fontSize: 20,
                   ),
-                )
+                ),
               ],
-            )
+            ),
           ],
-        
         ),
       ),
-      
     );
   }
 
-  BoxDecoration _buidBoxDecoration() => const BoxDecoration(
-    color: Color(0xFF3b486a),
-    borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30))
-  );
+  BoxDecoration _buildBoxDecoration() => const BoxDecoration(
+        color: Color(0xFF3b486a),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(30),
+          bottomRight: Radius.circular(30),
+        ),
+      );
 }
 
 class _BackgroundImage extends StatelessWidget {
   final String image;
 
   const _BackgroundImage({
-    required this.image
+    required this.image,
   });
 
   @override

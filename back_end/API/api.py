@@ -7,13 +7,21 @@ from rest_framework.exceptions import PermissionDenied
 from django.contrib.auth.models import Group
 from rest_framework import viewsets, status
 from django.contrib.auth.models import Group
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import RegistroSerializer
 
+@api_view(['POST'])
+@authentication_classes([])
+@permission_classes([])
+def registro(request):
+    serializer = RegistroSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-class PersonaViewSet(viewsets.ModelViewSet):
-    queryset = Persona.objects.all()
-    permission_classes = [IsAuthenticated, DjangoModelPermissions]
-    serializer_class = PersonaSerializer
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
@@ -24,16 +32,6 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         usuario = self.request.user
         user = Usuario.objects.filter(id=usuario.id)
         return user
-
-class RegistroViewSet(viewsets.ModelViewSet):
-    queryset = Registro.objects.all()
-    permission_classes = [IsAuthenticated, DjangoModelPermissions]
-    serializer_class = RegistroSerializer
-
-class GroupViewSet(viewsets.ModelViewSet):
-    queryset = Group.objects.all()
-    permission_classes = [IsAuthenticated, DjangoModelPermissions]
-    serializer_class = GroupSerializer
 
 class ProyectoViewSet(viewsets.ModelViewSet):
     queryset = Proyecto.objects.all()
@@ -98,47 +96,7 @@ class TareaViewSet(viewsets.ModelViewSet):
             instance.delete()
         else:
             raise PermissionDenied('No tienes permiso para eliminar esta tarea')
-
-class RecursoViewSet(viewsets.ModelViewSet):
-    queryset = Recurso.objects.all()
-    permission_classes = [IsAuthenticated, DjangoModelPermissions]
-    serializer_class = RecursoSerializer
-
-class EstadoViewSet(viewsets.ModelViewSet):
-    queryset = Estado.objects.all()
-    permission_classes = [IsAuthenticated, DjangoModelPermissions]
-    serializer_class = EstadoSerializer
-
-class TipoViewSet(viewsets.ModelViewSet):
-    queryset = Tipo.objects.all()
-    permission_classes = [IsAuthenticated, DjangoModelPermissions]
-    serializer_class = TipoSerializer
-
-class PrioridadViewSet(viewsets.ModelViewSet):
-    queryset = Prioridad.objects.all()
-    permission_classes = [IsAuthenticated, DjangoModelPermissions]
-    serializer_class = PrioridadSerializer
-
-class UsuariosRegistroViewSet(viewsets.ModelViewSet):
-    queryset = UsuariosRegistro.objects.all()
-    permission_classes = [IsAuthenticated, DjangoModelPermissions]
-    serializer_class = UsuariosRegistroSerializer
-
-class RecursoProyectoViewSet(viewsets.ModelViewSet):
-    queryset = RecursoProyecto.objects.all()
-    permission_classes = [IsAuthenticated, DjangoModelPermissions]
-    serializer_class = RecursoProyectoSerializer
-
-class RecursoTareaViewSet(viewsets.ModelViewSet):
-    queryset = RecursoTarea.objects.all()
-    permission_classes = [IsAuthenticated, DjangoModelPermissions]
-    serializer_class = RecursoTareaSerializer
-
-class UsuarioTareaViewSet(viewsets.ModelViewSet):
-    queryset = UsuarioTarea.objects.all()
-    permission_classes = [IsAuthenticated, DjangoModelPermissions]
-    serializer_class = UsuarioTareaSerializer
-
+        
 class GroupUsuarioProyectoViewSet(viewsets.ModelViewSet):
     queryset = GroupUsuarioProyecto.objects.all()
     permission_classes = [IsAuthenticated]

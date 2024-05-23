@@ -1,6 +1,7 @@
+import "package:bee_note_application/connection/api_service.dart";
 import "package:bee_note_application/widgets/widgsts.dart";
 import "package:flutter/material.dart";
-
+import 'package:dio/dio.dart';
 class FormLogin extends StatefulWidget {
   const FormLogin({super.key});
 
@@ -9,84 +10,128 @@ class FormLogin extends StatefulWidget {
 }
 
 class _FormLoginState extends State<FormLogin> {
-
   final GlobalKey<FormState> _formState = GlobalKey<FormState>();
   bool _obscureText1 = true;
+  bool _isLoading = false;
 
   final userTextController = TextEditingController();
-  final passwodrTextController = TextEditingController();
+  final passwordTextController = TextEditingController();
+
+  @override
+  void dispose() {
+    userTextController.dispose();
+    passwordTextController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _login() async {
+    if (_formState.currentState!.validate()) {
+      final username = userTextController.text;
+      final password = passwordTextController.text;
+
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        final response = await ApiService.login(username, password);
+        Navigator.pushReplacementNamed(context, 'home');
+      } catch (e) {
+        print('Error: $e');
+        print(e.toString());
+        print(e is DioError); // true
+
+        String errorMessage = 'Ocurrió un error durante el inicio de sesión. Por favor, intenta nuevamente.';
+
+        if (e is DioError) {
+          if (e.response?.statusCode == 401) {
+            errorMessage = 'Credenciales incorrectas. Por favor, verifica tu nombre de usuario y contraseña.';
+          }
+        }
+
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Error'),
+            content: Text(errorMessage),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Form(
       autovalidateMode: AutovalidateMode.onUserInteraction,
       key: _formState,
-
       child: Column(
         children: [
           const SizedBox(height: 30),
-        
+          
           // Nombre Usuario
-
           MyTextFormField(
             controller: userTextController,
             hintText: 'Usuario',
             obscureText: false,
             validator: (value) {
-
               return (value == null || value.isEmpty)
-                ? 'El campo no puede estar vacio'
-                : null;
-
+                  ? 'El campo no puede estar vacío'
+                  : null;
             },
           ),
-      
+          
           // Password
           MyTextFormField(
-            controller: passwodrTextController,
+            controller: passwordTextController,
             hintText: 'Contraseña',
             obscureText: _obscureText1,
             suffixIcon: GestureDetector(
-              onTap: (){
+              onTap: () {
                 setState(() {
                   _obscureText1 = !_obscureText1;
                 });
               },
-              child: Icon(_obscureText1 ? Icons.visibility : Icons.visibility_off),
+              child: Icon(
+                _obscureText1 ? Icons.visibility : Icons.visibility_off,
+              ),
             ),
             validator: (value) {
-
-              return (value != null && value.length >= 6) 
-                ? null 
-                : 'La contraseña debe de ser de 6 caracteres';
-
+              return (value != null && value.length >= 6)
+                  ? null
+                  : 'La contraseña debe de ser de 6 caracteres';
             },
           ),
-        
-          // Boton Iniciar Sesion
+          
           const SizedBox(height: 25),
-          HexagonalButton(
-            onTap: (){
-              // Lógica para el evento de tap (Iniciar sesion)
-              if(_formState.currentState!.validate()){
-                Navigator.pushReplacementNamed(context, 'home');
-              }
-              return null;
-
-            },
-            text: 'Iniciar Sesion'
-          ),
-        
+          
+          // Botón Iniciar Sesión
+          _isLoading
+              ? CircularProgressIndicator()
+              : HexagonalButton(
+                  onTap: _login,
+                  text: 'Iniciar Sesión',
+                ),
+          
           // Registrar
           GestureDetector(
             onTap: () {
-              // Lógica para el evento de tap (registro)
               Navigator.pushReplacementNamed(context, 'register1');
             },
             child: const SizedBox(
               child: Text(
-                'Registrate',
-                style: TextStyle(
+                'Regístrate',
+                  style: TextStyle(
                   fontFamily: 'Letters_for_Learners',
                   fontSize: 30,
                   color: Color(0xFFF3753D),
@@ -94,7 +139,7 @@ class _FormLoginState extends State<FormLogin> {
               ),
             ),
           ),
-        
+          
           const Text(
             'o',
             style: TextStyle(
@@ -103,13 +148,16 @@ class _FormLoginState extends State<FormLogin> {
               color: Color(0xFFF3753D),
             ),
           ),
-        
-          // Boton de registro con Google
+          
           const SizedBox(height: 10),
-          MyButtonGoogle(onTap: (){}, text: 'Google')
+          
+          // Botón de registro con Google
+          MyButtonGoogle(
+            onTap: () {},
+            text: 'Google',
+          ),
         ],
       ),
-
     );
   }
 }

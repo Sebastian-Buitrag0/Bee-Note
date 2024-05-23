@@ -1,79 +1,47 @@
 import 'package:bee_note_application/data/task.dart';
 import 'package:bee_note_application/data/user.dart';
+import 'dart:convert';
 
-class Project{
-  final String name;
-  final String description;
-  final List<User> users;
-  final String image;
-  final List<Task> tasks;
+Proyecto proyectoFromJson(String str) => Proyecto.fromJson(json.decode(str));
 
-  Project({
-    required this.name, 
-    required this.description, 
-    required this.users, 
-    required this.image,
-    required this.tasks,
-  });
+String proyectoToJson(Proyecto data) => json.encode(data.toJson());
+
+class Proyecto {
+    int id;
+    int estado;
+    String nombre;
+    String descripcion;
+    DateTime fechaCreacion;
+    DateTime fechaInicio;
+    DateTime fechaFin;
+
+    Proyecto({
+        required this.id,
+        required this.estado,
+        required this.nombre,
+        required this.descripcion,
+        required this.fechaCreacion,
+        required this.fechaInicio,
+        required this.fechaFin,
+    });
+
+    factory Proyecto.fromJson(Map<String, dynamic> json) => Proyecto(
+        id: json["id"],
+        estado: json["estado"],
+        nombre: json["nombre"],
+        descripcion: json["descripcion"],
+        fechaCreacion: DateTime.parse(json["fechaCreacion"]),
+        fechaInicio: DateTime.parse(json["fechaInicio"]),
+        fechaFin: DateTime.parse(json["fechaFin"]),
+    );
+
+    Map<String, dynamic> toJson() => {
+        "id": id,
+        "estado": estado,
+        "nombre": nombre,
+        "descripcion": descripcion,
+        "fechaCreacion": fechaCreacion.toIso8601String(),
+        "fechaInicio": fechaInicio.toIso8601String(),
+        "fechaFin": fechaFin.toIso8601String(),
+    };
 }
-//  todo: TIENES LA IDEA
-final allProject = [
-  Project(
-    name: 'BeeNote', 
-    description: 'Eiusmod irure esse enim eu commodo nostrud velit qui fugiat tempor aliquip nulla.', 
-    users: [allUser[0], allUser[1], allUser[2], allUser[4]], 
-    image: 'assets/img/fondo.png',
-    tasks: [
-      Task(
-        name: 'Crear logo', 
-        description: 'Exercitation elit quis eu irure aute labore id est aliquip.', 
-        startDate: DateTime.now(), 
-        endDate: DateTime.utc(2024, 12, 9), 
-        user: [allUser[2]], 
-        image: 'image'
-      ),
-      Task(
-        name: 'Crear frontEnd', 
-        description: 'Exercitation elit quis eu irure aute labore id est aliquip.', 
-        startDate: DateTime.now(), 
-        endDate: DateTime.utc(2024, 5, 7), 
-        user: [allUser[0]], 
-        image: 'image'
-      ),
-    ]
-  ),
-
-  Project(
-    name: 'HostPital', 
-    description: 'Amet ipsum adipisicing commodo enim exercitation enim esse non veniam occaecat duis sit Lorem fugiat.', 
-    users: [allUser[0], allUser[1], allUser[2]], 
-    image: 'assets/img/background_hospital.png',
-    tasks: [
-      Task(
-        name: 'Crear Funcion de inicio de sesion', 
-        description: 'Exercitation elit quis eu irure aute labore id est aliquip.', 
-        startDate: DateTime.now(), 
-        endDate: DateTime.utc(2024, 12, 9), 
-        user: [allUser[2]], 
-        image: 'image'
-      ),
-    ]
-  ),
-
-  Project(
-    name: 'Transfercoop', 
-    description: 'Incididunt Lorem laboris excepteur excepteur.', 
-    users: [allUser[0], allUser[1], allUser[2]], 
-    image: 'assets/img/background_banco.png',
-    tasks: [
-      Task(
-        name: 'Crear el frontend', 
-        description: 'Exercitation elit quis eu irure aute labore id est aliquip.', 
-        startDate: DateTime.now(), 
-        endDate: DateTime.utc(2024, 12, 9), 
-        user: [allUser[2]], 
-        image: 'image'
-      )
-    ]
-  )
-];

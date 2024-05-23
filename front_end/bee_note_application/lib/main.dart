@@ -1,25 +1,23 @@
-import 'package:bee_note_application/routes/routes.dart';
 import 'package:flutter/material.dart';
-
-void main() => runApp(const MyApp());
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      // home: LoginPage(),
-      initialRoute: 'home',
-      routes: appRoutes,
-    );
-  }
+import 'package:provider/provider.dart';
+import 'package:bee_note_application/providers/user_provider.dart';
+import 'package:bee_note_application/routes/routes.dart';
+void main() {
+runApp(
+ChangeNotifierProvider(
+create: (context) => UserProvider(),
+child: const MyApp(),
+),
+);
 }
-
-
-//  El amarillo: #FED430
-//  El Azul: #3C486B
-//  El naranja: #F3753D
-//  El Grisaceo: #F0F0F0
-//  El gris mas oscuro: #BEBEBE
+class MyApp extends StatelessWidget {
+const MyApp({super.key});
+@override
+Widget build(BuildContext context) {
+return MaterialApp(
+debugShowCheckedModeBanner: false,
+initialRoute: 'login',
+routes: appRoutes,
+);
+}
+}

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class TaskPage extends StatelessWidget {
-  final Project project;
+  final Proyecto project;
   const TaskPage({
     super.key, 
     required this.project
@@ -36,13 +36,13 @@ class TaskPage extends StatelessWidget {
       ),
       // body: const Center(child: Text('Screen de tarea')),
       body: ListView.builder(
-        itemCount: project.tasks.length,
+        //itemCount: project.tasks.length,
         itemBuilder: (BuildContext context, int index) {
-          final task = project.tasks[index];
-          final formattDate1 = DateFormat('yyyy-MM-dd').format(task.startDate);
-          final formattDate2 = DateFormat('yyyy-MM-dd').format(task.endDate);
+          //final task = project.tasks[index];
+          //final formattDate1 = DateFormat('yyyy-MM-dd').format(task.startDate);
+          //final formattDate2 = DateFormat('yyyy-MM-dd').format(task.endDate);
 
-          return buildTaskListTile(task, formattDate1, formattDate2);
+          //return buildTaskListTile(task, formattDate1, formattDate2);
           
         },
       ),
