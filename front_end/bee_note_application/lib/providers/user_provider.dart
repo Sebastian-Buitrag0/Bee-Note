@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:bee_note_application/data/user.dart';
 import 'package:bee_note_application/data/datos_personales.dart'; // Asegúrate de que este es el camino correcto al modelo
 
 class UserProvider extends ChangeNotifier {

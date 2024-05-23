@@ -1,5 +1,3 @@
-import 'package:bee_note_application/data/task.dart';
-import 'package:bee_note_application/data/user.dart';
 import 'dart:convert';
 
 Proyecto proyectoFromJson(String str) => Proyecto.fromJson(json.decode(str));

@@ -3,7 +3,6 @@ import 'package:bee_note_application/providers/user_provider.dart';
 import 'package:bee_note_application/widgets/widgsts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:bee_note_application/data/user.dart';
 import 'package:bee_note_application/data/datos_personales.dart'; // Importa el modelo de datos
 
 class FormRegister1 extends StatefulWidget {

@@ -2,7 +2,6 @@ import 'package:bee_note_application/widgets/widgsts.dart';
 import 'package:flutter/material.dart';
 import 'package:bee_note_application/providers/user_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:bee_note_application/data/datos_personales.dart';
 import 'package:bee_note_application/connection/api_service.dart';
 
 class FormRegister2 extends StatefulWidget {

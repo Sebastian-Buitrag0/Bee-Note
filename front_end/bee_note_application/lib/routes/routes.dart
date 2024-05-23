@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:bee_note_application/pages/collaborator_page.dart';
 import 'package:bee_note_application/pages/create_task_page.dart';
 import 'package:bee_note_application/pages/home_page.dart';
@@ -7,7 +6,6 @@ import 'package:bee_note_application/pages/login_page.dart';
 import 'package:bee_note_application/pages/create_project_page.dart';
 import 'package:bee_note_application/pages/register_page_pt1.dart';
 import 'package:bee_note_application/pages/register_page_pt2.dart';
-import 'package:bee_note_application/providers/user_provider.dart';
 
 final Map<String, Widget Function(BuildContext)> appRoutes = { 
   'login': (_) => const LoginPage(), 

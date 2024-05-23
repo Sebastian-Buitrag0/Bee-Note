@@ -1,3 +1,4 @@
+import 'package:bee_note_application/connection/api_service.dart';
 import 'package:flutter/material.dart';
 
 import 'dart:io';
@@ -6,11 +7,12 @@ import 'dart:typed_data';
 import 'package:bee_note_application/widgets/widgsts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-
+import 'package:bee_note_application/data/project.dart';
 class FormProyect extends StatefulWidget {
 
   final String name;
   final bool showMyTextFormField;
+  
 
   const FormProyect({
     super.key, 
@@ -23,6 +25,7 @@ class FormProyect extends StatefulWidget {
 }
 
 class _FormProyetcStaet extends State<FormProyect> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final projectNamwController = TextEditingController();
   final descriptionController = TextEditingController();
@@ -35,6 +38,7 @@ class _FormProyetcStaet extends State<FormProyect> {
   @override
   Widget build(BuildContext context) {
     return Form(
+      key: _formKey,
       child: Column(
         children: [
           const SizedBox(height: 20,),
@@ -72,13 +76,50 @@ class _FormProyetcStaet extends State<FormProyect> {
           ),
 
           const SizedBox(height: 20,),
-          
           HexagonalButton(
-            onTap:() {
-              // todo: funcion para guardar los campos de nuevo proyecto
-            },
-            text: 'Guardar',
+  onTap: () async {
+    print('Guardar');
+    if (_formKey.currentState!.validate()) {
+      try {
+        // Llamar al método createProyecto de ApiService
+        await ApiService.createProyecto(
+          projectNamwController.text,
+          descriptionController.text,
+          DateTime.parse("2003-03-03"),
+          DateTime.parse("2003-03-03"),
+          1, // Aquí puedes asignar el ID del estado deseado
+        );
+        // Proyecto creado exitosamente
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Proyecto creado exitosamente')),
+        );
+        // Limpiar los campos del formulario después de crear el proyecto
+        projectNamwController.clear();
+        descriptionController.clear();
+        starDateController.clear();
+        endDateController.clear();
+      } catch (e) {
+        // Manejar el error de creación del proyecto
+        print('Error al crear el proyecto: $e');
+        // Mostrar un mensaje de error al usuario
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Error'),
+            content: Text('Ocurrió un error al crear el proyecto. Por favor, inténtalo de nuevo.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('OK'),
+              ),
+            ],
           ),
+        );
+      }
+    }
+  },
+  text: 'Guardar',
+),
 
           const SizedBox(height: 20,),
         ],

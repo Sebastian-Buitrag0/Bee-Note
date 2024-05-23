@@ -1,11 +1,10 @@
-import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:bee_note_application/data/project.dart';
 
 class ApiService {
   static const String baseUrl =
-      'http://127.0.0.1:8000/api'; // Reemplaza con la URL de tu servidor Django
+      'https://dcg4f89z-8000.use.devtunnels.ms/api'; // Reemplaza con la URL de tu servidor Django
   static final Dio _dio = Dio();
 
   // Método para iniciar sesión
@@ -134,6 +133,48 @@ static Future<void> registerUser(
     }
   }
 }
+
+
+static Future<void> createProyecto(
+  String nombre,
+  String descripcion,
+  DateTime fechaInicio,
+  DateTime fechaFin,
+  int estado,
+) async {
+  try {
+    final accessToken = await getAccessToken();
+    final response = await _dio.post(
+      '$baseUrl/proyecto/',
+      data: {
+        'nombre': nombre,
+        'descripcion': descripcion,
+        'fechaInicio': fechaInicio.toIso8601String(),
+        'fechaFin': fechaFin.toIso8601String(),
+        'estado': estado,
+      },
+      options: Options(
+        headers: {'Authorization': 'Bearer $accessToken'},
+      ),
+    );
+
+    if (response.statusCode == 201) {
+      // El proyecto se creó exitosamente
+      print('Proyecto creado exitosamente');
+    } else {
+      throw Exception('Error al crear el proyecto');
+    }
+  } on DioError catch (e) {
+    if (e.response != null) {
+      print('Error del servidor: ${e.response?.data}');
+      throw Exception('Error al crear el proyecto: ${e.response?.data['detail']}');
+    } else {
+      print('Error al conectar con el servidor: $e');
+      throw Exception('Error al conectar con el servidor');
+    }
+  }
+}
+
 
 
 }
