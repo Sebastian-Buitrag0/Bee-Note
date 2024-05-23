@@ -57,7 +57,7 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:56418',  # URL de tu aplicación Flutter en modo de desarrollo
+    'http://localhost:56898',  # URL de tu aplicación Flutter en modo de desarrollo
 ]
 
 CORS_ALLOW_CREDENTIALS = True

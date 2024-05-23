@@ -4,7 +4,7 @@ import 'package:bee_note_application/data/project.dart';
 
 class ApiService {
   static const String baseUrl =
-      'https://dcg4f89z-8000.use.devtunnels.ms/api'; // Reemplaza con la URL de tu servidor Django
+      'http://127.0.0.1:8000/api'; // Reemplaza con la URL de tu servidor Django
   static final Dio _dio = Dio();
 
   // Método para iniciar sesión
