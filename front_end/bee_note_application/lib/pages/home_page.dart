@@ -21,7 +21,14 @@ class _HomePageState extends State<HomePage> {
     _getProyectos();
   }
 
-
+  @override
+  void didUpdateWidget(covariant HomePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final reload = ModalRoute.of(context)?.settings.arguments as bool?;
+    if (reload ?? false) {
+      _getProyectos();
+    }
+  }
 
   Future<void> _getProyectos() async {
     try {
