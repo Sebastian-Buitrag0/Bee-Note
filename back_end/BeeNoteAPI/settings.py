@@ -32,7 +32,10 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
 ]
 
-
+JWT_AUTH = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=50),  # Duración del token de acceso
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),      # Duración del token de actualización
+}
 # Application definition
 
 INSTALLED_APPS = [
@@ -60,6 +63,7 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
+    'http://localhost:56898',  # URL de tu aplicación Flutter en modo de desarrollo
     "http://localhost:8000",
     "http://127.0.0.1:8000",
     "http://localhost:3000",  # Si usas un frontend en otro puerto
@@ -157,11 +161,6 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
-}
-
-JWT_AUTH = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=50),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
 
 AUTH_USER_MODEL = ('API.Usuario')

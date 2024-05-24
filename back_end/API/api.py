@@ -1,5 +1,3 @@
-import requests
-
 from rest_framework.response import Response
 from .models import Persona, Usuario, Registro, Proyecto, Tarea, Recurso, Estado, Tipo, Prioridad, UsuariosRegistro, RecursoProyecto, RecursoTarea, UsuarioTarea, GroupUsuarioProyecto
 from .serializers import  RegistroUsuarioSerializer, PersonaSerializer, UsuarioSerializer, RegistroSerializer, GroupSerializer, ProyectoSerializer, TareaSerializer, RecursoSerializer, EstadoSerializer, TipoSerializer, PrioridadSerializer, UsuariosRegistroSerializer, RecursoProyectoSerializer, RecursoTareaSerializer, UsuarioTareaSerializer, GroupUsuarioProyectoSerializer
@@ -68,37 +66,36 @@ class ProyectoViewSet(viewsets.ModelViewSet):
 
 class TareaViewSet(viewsets.ModelViewSet):
     queryset = Tarea.objects.all()
-    permission_classes = [IsAuthenticated, DjangoModelPermissions]
+    permission_classes = [IsAuthenticated]
     serializer_class = TareaSerializer
 
     def get_queryset(self):
         usuario = self.request.user
-        proyectos_usuario = Proyecto.objects.filter(groupusuarioproyecto__idUsuario=usuario)
-        return Tarea.objects.filter(idProyecto__in=proyectos_usuario)
-
-    def perform_create(self, serializer):
-        proyecto = serializer.validated_data['idProyecto']
-        usuario = self.request.user
-        if usuario.has_perm('app_name.add_tarea', proyecto):
-            serializer.save()
+        proyecto_id = self.kwargs.get('proyecto_id')
+        
+        if proyecto_id:
+            try:
+                proyecto = Proyecto.objects.get(id=proyecto_id, groupusuarioproyecto__idUsuario=usuario)
+                return Tarea.objects.filter(idProyecto=proyecto)
+            except Proyecto.DoesNotExist:
+                return Tarea.objects.none()
         else:
-            raise PermissionDenied('No tienes permiso para crear tareas en este proyecto')
+            proyectos_usuario = Proyecto.objects.filter(groupusuarioproyecto__idUsuario=usuario)
+            return Tarea.objects.filter(idProyecto__in=proyectos_usuario)
+    
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=201, headers=headers)
+            
     def perform_update(self, serializer):
-        tarea = self.get_object()
-        usuario = self.request.user
-        if usuario.has_perm('app_name.change_tarea', tarea.idProyecto):
-            serializer.save()
-        else:
-            raise PermissionDenied('No tienes permiso para editar esta tarea')
+        serializer.save()
 
     def perform_destroy(self, instance):
-        usuario = self.request.user
-        if usuario.has_perm('app_name.delete_tarea', instance.idProyecto):
-            instance.delete()
-        else:
-            raise PermissionDenied('No tienes permiso para eliminar esta tarea')
-        
+        instance.delete()
 class GroupUsuarioProyectoViewSet(viewsets.ModelViewSet):
     queryset = GroupUsuarioProyecto.objects.all()
     permission_classes = [IsAuthenticated]
@@ -157,4 +154,3 @@ class RegistroUsuarioView(generics.CreateAPIView):
     queryset = Usuario.objects.all()
     serializer_class = RegistroUsuarioSerializer
     permission_classes = [AllowAny]
-
