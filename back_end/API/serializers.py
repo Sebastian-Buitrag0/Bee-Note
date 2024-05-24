@@ -49,22 +49,20 @@ class GroupSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ('id','name','descripcion',)
 
-class ProyectoSerializer(serializers.ModelSerializer):
-    estado = serializers.PrimaryKeyRelatedField(queryset=Estado.objects.all())
-    class Meta:
-        model = Proyecto
-        fields = '__all__'
-        read_only_fields = ('id','fechaCreacion',)
-
 class TareaSerializer(serializers.ModelSerializer):
-    idProyecto = ProyectoSerializer(many=False, read_only=True)
-    prioridad = PrioridadSerializer(many=False, read_only=True)
-    estado = EstadoSerializer(many=False, read_only=True)
     class Meta:
         model = Tarea
         fields = '__all__'
-        read_only_fields = ('id','fechaCreacion',)
+        read_only_fields = ('id', 'fechaCreacion')
 
+class ProyectoSerializer(serializers.ModelSerializer):
+    estado = serializers.PrimaryKeyRelatedField(queryset=Estado.objects.all())
+    tareas = TareaSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Proyecto
+        fields = '__all__'
+        read_only_fields = ('id', 'fechaCreacion')
 class RecursoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recurso
