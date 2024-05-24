@@ -7,11 +7,13 @@ class SideMenu extends StatelessWidget {
 
   final String? nomrbeUsuario;
   final String? password;
+  final String? imagenPerfilUrl;
 
   const SideMenu({
     super.key, 
     required this.nomrbeUsuario, 
-    required this.password
+    required this.password, 
+    required this.imagenPerfilUrl
   });
 
   @override
@@ -22,7 +24,7 @@ class SideMenu extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _BuidHeader(nombreUsuario: nomrbeUsuario,), 
+            _BuidHeader(nombreUsuario: nomrbeUsuario, imagenPerfilUrl: imagenPerfilUrl,), 
             _BuildMeniItems()
           ],
         ),
@@ -34,8 +36,9 @@ class SideMenu extends StatelessWidget {
 
 class _BuidHeader extends StatelessWidget {
   final String? nombreUsuario;
+  final String? imagenPerfilUrl;
 
-  const _BuidHeader({required this.nombreUsuario});
+  const _BuidHeader({required this.nombreUsuario, required this.imagenPerfilUrl});
 
   @override
   Widget build(BuildContext context) {
@@ -43,10 +46,12 @@ class _BuidHeader extends StatelessWidget {
       padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
       child: Column(
         children: [
-          const CircleAvatar(
+          CircleAvatar(
             radius: 52,
-            backgroundImage: AssetImage('assets/img/defauls_avatar_img.png'),
-            backgroundColor: Color(0xFFFED430),
+            backgroundImage: imagenPerfilUrl != null
+                ? NetworkImage(imagenPerfilUrl!)
+                : const AssetImage('assets/img/defauls_avatar_img.png') as ImageProvider<Object>?,
+            backgroundColor: const Color(0xFFFED430),
           ),
           const SizedBox(height: 12,),
           Text(
@@ -93,7 +98,7 @@ class _BuildMeniItems extends StatelessWidget {
               size: 40,
             ),
             title: const Text(
-              'Home',
+              'Logout',
               style: TextStyle(
                 fontFamily: 'Letters_for_Learners',
                 fontSize: 40,
@@ -116,7 +121,7 @@ class _BuildMeniItems extends StatelessWidget {
               size: 40,
             ),
             title: const Text(
-              'Home',
+              'Info',
               style: TextStyle(
                 fontFamily: 'Letters_for_Learners',
                 fontSize: 40,

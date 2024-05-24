@@ -44,10 +44,11 @@ class _HomePageState extends State<HomePage> {
     final userProvider = Provider.of<UserProvider>(context);
     final nombreUsuario = userProvider.nombreUsuario; 
     final password = userProvider.password;
+    final imagenPerfilUrl = userProvider.imagenPerfilUrl;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF0F0F0),
-      drawer: SideMenu(nomrbeUsuario: nombreUsuario, password: password,),
+      drawer: SideMenu(nomrbeUsuario: nombreUsuario, password: password, imagenPerfilUrl: imagenPerfilUrl,),
       appBar: AppBar(
         backgroundColor: const Color(0xFFFED430),
         toolbarHeight: 85,
@@ -116,9 +117,12 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: HexagonalButton(
-        onTap: () {
+        onTap: () async {
           // Lógica para el botón hexagonal
-          Navigator.pushNamed(context, 'create_project');
+          final result = await Navigator.pushNamed(context, 'create_project');
+          if(result == true){
+            _getProyectos();
+          }
         },
         iconData: Icons.add,
         sizewidth: 90,

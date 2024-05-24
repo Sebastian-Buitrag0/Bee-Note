@@ -31,6 +31,7 @@ class PrioridadSerializer(serializers.ModelSerializer):
 
 class UsuarioSerializer(serializers.ModelSerializer):
     datosPersonales = PersonaSerializer(many=False, read_only=True)
+    imagen_perfil_url = serializers.URLField(required = False)
     class Meta:
         model = Usuario
         fields = '__all__'

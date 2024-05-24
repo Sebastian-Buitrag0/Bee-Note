@@ -53,7 +53,7 @@ class Usuario(AbstractBaseUser,PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     datosPersonales = models.ForeignKey(Persona, on_delete=models.CASCADE)
-    imagenPerfil = models.ForeignKey(Recurso, on_delete=models.SET_NULL, null=True)
+    imagenPerfil = models.ForeignKey(Recurso, on_delete=models.SET_NULL, null=True, blank=True)
 
     USERNAME_FIELD = 'nombreUsuario'
 

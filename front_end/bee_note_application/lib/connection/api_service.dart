@@ -175,6 +175,20 @@ static Future<void> createProyecto(
   }
 }
 
-
+  static Future<void> updateImagenPerfilUrl(String imagenPerfilUrl) async {
+    try {
+      final accessToken = await getAccessToken();
+      await _dio.patch(
+        '$baseUrl/usuario/',
+        data: {'imagen_perfil_url': imagenPerfilUrl},
+        options: Options(
+          headers: {'Authorization': 'Bearer $accessToken'},
+        ),
+      );
+    } catch (e) {
+      // Manejar el error de acuerdo a tus necesidades
+      print('Error al actualizar la URL de la imagen de perfil: $e');
+    }
+  }
 
 }

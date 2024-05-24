@@ -5,6 +5,7 @@ class UserProvider extends ChangeNotifier {
   DatosPersonales? datosPersonales;
   String? nombreUsuario;
   String? password;
+  String? imagenPerfilUrl;
 
   void updateDatosPersonales(DatosPersonales value) {
     datosPersonales = value;
@@ -18,6 +19,11 @@ class UserProvider extends ChangeNotifier {
 
   void updatePassword(String? value) {
     password = value;
+    notifyListeners();
+  }
+
+  void updateImagePerfilUrl(String? value) {
+    imagenPerfilUrl = value;
     notifyListeners();
   }
 }

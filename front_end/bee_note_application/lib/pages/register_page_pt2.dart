@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:bee_note_application/connection/api_service.dart';
+import 'package:bee_note_application/providers/user_provider.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:bee_note_application/widgets/widgsts.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 class RegisterPage2 extends StatefulWidget {
   const RegisterPage2({super.key});
@@ -150,6 +153,8 @@ class _RegisterState extends State<RegisterPage2> {
     final imageUrl = await cargarImg(selectedImage!);
     if(imageUrl != null){
       print('url de la imagen $imageUrl');
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      userProvider.updateImagePerfilUrl(imageUrl);
     }
 
     Navigator.of(context).pop();
@@ -169,6 +174,8 @@ class _RegisterState extends State<RegisterPage2> {
     final imageUrl = await cargarImg(selectedImage!);
     if(imageUrl != null){
       print('url de la imagen $imageUrl');
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      userProvider.updateImagePerfilUrl(imageUrl);
     }
 
     Navigator.of(context).pop();
@@ -177,19 +184,20 @@ class _RegisterState extends State<RegisterPage2> {
   Future<String?> cargarImg(File imgeFile) async {
     final url = Uri.parse('https://api.imgbb.com/1/upload');
     final request = http.MultipartRequest('POST', url);
-
     final apiKey = 'a90ceb74adc8e677b025b2bf30c0a9d6';
     request.fields['key'] = apiKey;
-
     final file = await http.MultipartFile.fromPath('image', imgeFile.path);
     request.files.add(file);
-
     final response = await request.send();
-
-    if(response.statusCode == 200){
+    
+    if (response.statusCode == 200) {
       final responseData = await response.stream.bytesToString();
       final data = json.decode(responseData);
       final imageUrl = data['data']['url'];
+      
+      // Enviar la URL de la imagen al servidor Django
+      await ApiService.updateImagenPerfilUrl(imageUrl);
+      
       return imageUrl;
     }
     return null;

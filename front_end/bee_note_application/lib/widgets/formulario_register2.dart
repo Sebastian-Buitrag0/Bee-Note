@@ -112,7 +112,7 @@ class _FormRegister2State extends State<FormRegister2> {
               content: Text('Ocurrió un error al registrar el usuario. Por favor, inténtalo de nuevo.'),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => Navigator.pushNamed(context, 'home'),
                   child: Text('OK'),
                 ),
               ],
