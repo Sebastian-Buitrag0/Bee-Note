@@ -94,7 +94,7 @@ class _FormRegister2State extends State<FormRegister2> {
             datosPersonales.apellido,
             datosPersonales.correo,
             datosPersonales.telefono,
-            datosPersonales.fechaNacimiento.toString(),
+            datosPersonales.fechaNacimiento,
             userTextController.text,
             passWordTextController.text,
           );

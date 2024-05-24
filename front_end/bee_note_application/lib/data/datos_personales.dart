@@ -1,7 +1,7 @@
 class DatosPersonales {
   final String nombre;
   final String apellido;
-  final DateTime fechaNacimiento;
+  final String fechaNacimiento;
   final String telefono;
   final String correo;
 
@@ -16,7 +16,7 @@ class DatosPersonales {
   factory DatosPersonales.fromJson(Map<String, dynamic> json) => DatosPersonales(
         nombre: json["nombre"],
         apellido: json["apellido"],
-        fechaNacimiento: DateTime.parse(json["fechaNacimiento"]),
+        fechaNacimiento: json["fechaNacimiento"],
         telefono: json["telefono"],
         correo: json["correo"],
       );
@@ -24,7 +24,7 @@ class DatosPersonales {
   Map<String, dynamic> toJson() => {
         "nombre": nombre,
         "apellido": apellido,
-        "fechaNacimiento": fechaNacimiento.toIso8601String(),
+        "fechaNacimiento": fechaNacimiento,
         "telefono": telefono,
         "correo": correo,
       };

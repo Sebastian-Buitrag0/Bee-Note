@@ -37,7 +37,9 @@ class _FormRegister1State extends State<FormRegister1> {
             obscureText: false,
             paddingVertical: 0,
             validator: (value) {
-              return (value == null || value.isEmpty) ? 'El campo no puede estar vacio' : null;
+              return (value == null || value.isEmpty)
+                  ? 'El campo no puede estar vacio'
+                  : null;
             },
           ),
 
@@ -48,7 +50,9 @@ class _FormRegister1State extends State<FormRegister1> {
             obscureText: false,
             paddingVertical: 0,
             validator: (value) {
-              return (value == null || value.isEmpty) ? 'El campo no puede estar vacio' : null;
+              return (value == null || value.isEmpty)
+                  ? 'El campo no puede estar vacio'
+                  : null;
             },
           ),
 
@@ -60,9 +64,12 @@ class _FormRegister1State extends State<FormRegister1> {
             paddingVertical: 0,
             suffixIcon: const Icon(Icons.email),
             validator: (value) {
-              String pattern = r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+              String pattern =
+                  r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
               RegExp regExp = RegExp(pattern);
-              return regExp.hasMatch(value ?? '') ? null : 'El valor ingresado no luce como un correo';
+              return regExp.hasMatch(value ?? '')
+                  ? null
+                  : 'El valor ingresado no luce como un correo';
             },
           ),
 
@@ -85,11 +92,14 @@ class _FormRegister1State extends State<FormRegister1> {
             showDate: true,
             onDateSelected: (DateTime selectedDate) {
               setState(() {
-                birthdateTextController.text = DateFormat('yyyy-MM-dd').format(selectedDate);
+                birthdateTextController.text =
+                    DateFormat('yyyy-MM-dd').format(selectedDate);
               });
             },
             validator: (value) {
-              return (value == null || value.isEmpty) ? 'El campo no puede estar vacio' : null;
+              return (value == null || value.isEmpty)
+                  ? 'El campo no puede estar vacio'
+                  : null;
             },
           ),
 
@@ -103,21 +113,21 @@ class _FormRegister1State extends State<FormRegister1> {
               print(phoneTextController.text);
               print(birthdateTextController.text);
 
-              
               if (_formState.currentState!.validate()) {
                 // Formatear la fecha antes de enviarla al servidor
-                DateTime selectedDate = DateFormat('YYYY-MM-DD').parse(birthdateTextController.text);
 
                 // Almacenar los datos en UserProvider
-                final userProvider = Provider.of<UserProvider>(context, listen: false);
+                final userProvider =
+                    Provider.of<UserProvider>(context, listen: false);
                 userProvider.updateDatosPersonales(DatosPersonales(
                   nombre: nameTextController.text,
                   apellido: lastNameTextController.text,
                   correo: emailTextController.text,
                   telefono: phoneTextController.text,
-                  fechaNacimiento: selectedDate,
+                  fechaNacimiento: birthdateTextController.text,
                 ));
-            print('Datos personales antes de navegar: ${userProvider.datosPersonales}');
+                print(
+                    'Datos personales antes de navegar: ${userProvider.datosPersonales}');
                 // Navegar a la segunda página de registro
                 Navigator.restorablePushNamed(context, 'register2');
               }

@@ -21,15 +21,6 @@ class _HomePageState extends State<HomePage> {
     _getProyectos();
   }
 
-  @override
-  void didUpdateWidget(covariant HomePage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    final reload = ModalRoute.of(context)?.settings.arguments as bool?;
-    if (reload ?? false) {
-      _getProyectos();
-    }
-  }
-
   Future<void> _getProyectos() async {
     try {
       final proyectos = await ApiService.getProyectos();
@@ -40,6 +31,9 @@ class _HomePageState extends State<HomePage> {
       // Maneja el error de acuerdo a tus necesidades
       print('Error al obtener los proyectos: $e');
     }
+    setState(() {
+      _getProyectos();
+    });
   }
 
   @override
@@ -97,6 +91,7 @@ class _HomePageState extends State<HomePage> {
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => TaskPage(project: project)),
+              
             ),
             child: ProjectCard(project: project),
           );

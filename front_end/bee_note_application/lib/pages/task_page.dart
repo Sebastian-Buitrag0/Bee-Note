@@ -3,7 +3,6 @@ import 'package:bee_note_application/data/task.dart';
 import 'package:bee_note_application/ui/bottom_tap_bar.dart';
 import 'package:bee_note_application/widgets/widgsts.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class TaskPage extends StatelessWidget {
   final Proyecto project;

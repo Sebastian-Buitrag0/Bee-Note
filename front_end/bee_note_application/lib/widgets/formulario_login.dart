@@ -117,7 +117,7 @@ class _FormLoginState extends State<FormLogin> {
           
           // Botón Iniciar Sesión
           _isLoading
-              ? CircularProgressIndicator()
+              ? const CircularProgressIndicator()
               : HexagonalButton(
                   onTap: _login,
                   text: 'Iniciar Sesión',

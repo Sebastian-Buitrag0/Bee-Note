@@ -21,8 +21,8 @@ class ProjectCard extends StatelessWidget {
         child: Stack(
           alignment: Alignment.bottomLeft,
           children: [
-            _BackgroundImage(
-              image: "null",
+            const _BackgroundImage(
+              image: "assets/img/no_image.png",
             ),
             _ProjectDetails(
               project: project,
@@ -124,14 +124,14 @@ class _BackgroundImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(30),
-      child: SizedBox(
+      child: const SizedBox(
         width: double.infinity,
         height: 300,
-        child: FadeInImage(
-          placeholder: const AssetImage('assets/img/loading.gif'),
-          image: AssetImage(image),
-          fit: BoxFit.cover,
-        ),
+        // child: FadeInImage(
+        //   // placeholder: const AssetImage('assets/img/loading.gif'),
+        //   image: AssetImage(image),
+        //   fit: BoxFit.cover,
+        // ),
       ),
     );
   }
