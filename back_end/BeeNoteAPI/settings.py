@@ -27,7 +27,10 @@ SECRET_KEY = 'django-insecure-$97hp(%_go^a&(u$*+6j^28gg5a7qe7m8#nr_g0n305vbz7*$w
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '10.0.2.2',
+    '127.0.0.1',
+]
 
 
 # Application definition
@@ -57,8 +60,13 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:56418',  # URL de tu aplicación Flutter en modo de desarrollo
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    "http://localhost:3000",  # Si usas un frontend en otro puerto
+    "http://127.0.0.1:3000",
+    "http://10.0.2.2:8000",
 ]
+
 
 CORS_ALLOW_CREDENTIALS = True
 

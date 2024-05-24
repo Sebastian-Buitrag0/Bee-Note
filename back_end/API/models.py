@@ -50,7 +50,6 @@ class Usuario(AbstractBaseUser,PermissionsMixin):
         return self.nombreUsuario
     
 
-
 class Tipo(models.Model):
     id = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=64)
