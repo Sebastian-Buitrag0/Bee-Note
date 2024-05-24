@@ -1,3 +1,5 @@
+import requests
+
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import Group
@@ -71,14 +73,11 @@ class RecursoSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ('id','fechaSubida','tamaño','contribuidor','link','tipo',)
 
-
-
 class UsuariosRegistroSerializer(serializers.ModelSerializer):
     class Meta:
         model = UsuariosRegistro
         fields = '__all__'
         read_only_fields = ('id','idUsuario','idRegistro',)
-
 
 class RecursoProyectoSerializer(serializers.ModelSerializer):
     idProyecto = ProyectoSerializer(many=False, read_only=True)
@@ -114,18 +113,47 @@ class GroupUsuarioProyectoSerializer(serializers.ModelSerializer):
         read_only_fields = ('id','idProyecto','idGroup','idUsuario',)
 
 class RegistroUsuarioSerializer(serializers.ModelSerializer):
+    imagePerfil = serializers.ImageField(write_only = True, required = False)
     datosPersonales = PersonaSerializer()
 
     class Meta:
         model = Usuario
-        fields = ['nombreUsuario', 'password', 'datosPersonales']
+        fields = ['nombreUsuario', 'password', 'imagePerfil', 'datosPersonales']
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
+        imagenPerfil = validated_data.pop('imagenPerfil', None)
         datos_personales = validated_data.pop('datosPersonales')
         persona = Persona.objects.create(**datos_personales)
         usuario = Usuario.objects.create(datosPersonales=persona, **validated_data)
         usuario.set_password(validated_data['password'])
         usuario.save()
+
+        if imagenPerfil:
+            imgbb_url = self.upload_image_to_imgbb(imagenPerfil)
+            if imgbb_url:
+                recurso = Recurso(
+                    nombre=imagenPerfil.name,
+                    tipo=imagenPerfil.content_type,
+                    url=imgbb_url,
+                    tamaño=imagenPerfil.size
+                )
+                recurso.save()
+                usuario.imagenPerfil = recurso
+                usuario.save()
+
         return usuario
+
+
+    def cargar_image(self, image):
+        url = 'https://api.imgbb.com/1/upload'
+        payload = {
+            "key": "a90ceb74adc8e677b025b2bf30c0a9d6",
+            "image": image.read()
+        }
+        response = requests.post(url, data=payload)
+        if response.status_code == 200:
+            return response.json()["data"]["url"]
+        return None
+
     

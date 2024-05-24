@@ -1,3 +1,5 @@
+import requests
+
 from rest_framework.response import Response
 from .models import Persona, Usuario, Registro, Proyecto, Tarea, Recurso, Estado, Tipo, Prioridad, UsuariosRegistro, RecursoProyecto, RecursoTarea, UsuarioTarea, GroupUsuarioProyecto
 from .serializers import  RegistroUsuarioSerializer, PersonaSerializer, UsuarioSerializer, RegistroSerializer, GroupSerializer, ProyectoSerializer, TareaSerializer, RecursoSerializer, EstadoSerializer, TipoSerializer, PrioridadSerializer, UsuariosRegistroSerializer, RecursoProyectoSerializer, RecursoTareaSerializer, UsuarioTareaSerializer, GroupUsuarioProyectoSerializer
@@ -155,3 +157,4 @@ class RegistroUsuarioView(generics.CreateAPIView):
     queryset = Usuario.objects.all()
     serializer_class = RegistroUsuarioSerializer
     permission_classes = [AllowAny]
+
