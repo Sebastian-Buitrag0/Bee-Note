@@ -1,28 +1,50 @@
+import 'package:flutter/material.dart';
 import 'package:bee_note_application/data/project.dart';
 import 'package:bee_note_application/data/task.dart';
 import 'package:bee_note_application/ui/bottom_tap_bar.dart';
 import 'package:bee_note_application/widgets/widgsts.dart';
-import 'package:flutter/material.dart';
+import 'package:bee_note_application/connection/api_service.dart';
+import 'package:intl/intl.dart';
 
-class TaskPage extends StatelessWidget {
+class TaskPage extends StatefulWidget {
   final Proyecto project;
-  const TaskPage({
-    super.key, 
-    required this.project
-  });
 
+  const TaskPage({Key? key, required this.project}) : super(key: key);
+
+  @override
+  _TaskPageState createState() => _TaskPageState();
+}
+
+class _TaskPageState extends State<TaskPage> {
+  List<Tarea> _tareas = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _getTareas();
+  }
+
+  Future<void> _getTareas() async {
+  try {
+    final tareas = await ApiService.getTareasPorProyecto(widget.project.id);
+    setState(() {
+      _tareas = tareas.where((tarea) => tarea.idProyecto == widget.project.id).toList();
+    });
+  } catch (e) {
+    print('Error al obtener las tareas: $e');
+  }
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF0F0F0),
-
       appBar: AppBar(
         toolbarHeight: 85,
         title: const Text(
           'Tarea',
           style: TextStyle(
-            fontFamily: 'Letters_for_Learners', 
-            fontSize: 40, 
+            fontFamily: 'Letters_for_Learners',
+            fontSize: 40,
             color: Colors.white,
           ),
         ),
@@ -30,64 +52,53 @@ class TaskPage extends StatelessWidget {
         backgroundColor: const Color(0xFFFED430),
         iconTheme: const IconThemeData(
           color: Colors.white,
-          size: 45
+          size: 45,
         ),
       ),
-      // body: const Center(child: Text('Screen de tarea')),
       body: ListView.builder(
-        //itemCount: project.tasks.length,
+        itemCount: _tareas.length,
         itemBuilder: (BuildContext context, int index) {
-          //final task = project.tasks[index];
-          //final formattDate1 = DateFormat('yyyy-MM-dd').format(task.startDate);
-          //final formattDate2 = DateFormat('yyyy-MM-dd').format(task.endDate);
+          final task = _tareas[index];
+          final formattedStartDate = DateFormat('yyyy-MM-dd').format(task.fechaInicio);
+          final formattedEndDate = DateFormat('yyyy-MM-dd').format(task.fechaFin);
 
-          //return buildTaskListTile(task, formattDate1, formattDate2);
-          
+          return buildTaskListTile(task, formattedStartDate, formattedEndDate);
         },
       ),
-
-
-
       bottomNavigationBar: CustomBottomBar(
-        
-          iconLeft: Icons.info_outline,
-          onPressedLeft: () {
-            // Logica de poton izquierdo
-          },
-        
-          iconRight: Icons.search,
-          onPressedRight: () {
-            // Logica de poton derecha
-          },
+        iconLeft: Icons.info_outline,
+        onPressedLeft: () {
+          // Logica de botón izquierdo
+        },
+        iconRight: Icons.search,
+        onPressedRight: () {
+          // Logica de botón derecho
+        },
       ),
-
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: HexagonalButton(
-        onTap: () {
-          // Lógica para el botón hexagonal
-          Navigator.pushNamed(context, 'create_task');
-        },
-        iconData: Icons.add,
-        sizewidth: 90,
-        sizeHeight: 60,
-      ),
+  onTap: () {
+    Navigator.pushNamed(
+      context,
+      'create_task',
+      arguments: {'projectId': widget.project.id},
+    );
+  },
+  iconData: Icons.add,
+  sizewidth: 90,
+  sizeHeight: 60,
+),
 
     );
   }
 
-  Padding buildTaskListTile(Task task, String formattDate1, String formattDate2) {
+  Padding buildTaskListTile(Tarea task, String formattedStartDate, String formattedEndDate) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
-              
         width: double.infinity,
         margin: const EdgeInsets.symmetric(vertical: 10),
-                
-        padding: const EdgeInsets.symmetric(
-          horizontal: 15, 
-          // vertical: paddingVertical
-        ),
-      
+        padding: const EdgeInsets.symmetric(horizontal: 15),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(30),
           border: Border.all(color: Colors.white),
@@ -100,38 +111,37 @@ class TaskPage extends StatelessWidget {
             ),
           ],
         ),
-      
         child: ListTile(
           title: Text(
-            task.name,
+            task.nombre, // Cambio aquí
             style: const TextStyle(
               fontFamily: 'Letters_for_Learners',
               fontSize: 30,
               color: Color(0xFF3b486a),
-              decorationColor: Color(0xFF3b486a)
+              decorationColor: Color(0xFF3b486a),
             ),
           ),
           subtitle: Row(
             children: [
               Text(
-                formattDate1,
+                formattedStartDate, // Cambio aquí
                 style: const TextStyle(
                   fontFamily: 'Letters_for_Learners',
                   fontSize: 20,
                   color: Color(0xFF3b486a),
-                  decorationColor: Color(0xFF3b486a)
+                  decorationColor: Color(0xFF3b486a),
                 ),
               ),
-              const SizedBox(width: 20,),
+              const SizedBox(width: 20),
               Text(
-                formattDate2,
+                formattedEndDate, // Cambio aquí
                 style: const TextStyle(
                   fontFamily: 'Letters_for_Learners',
                   fontSize: 20,
                   color: Color(0xFF3b486a),
-                  decorationColor: Color(0xFF3b486a)
+                  decorationColor: Color(0xFF3b486a),
                 ),
-              )
+              ),
             ],
           ),
         ),

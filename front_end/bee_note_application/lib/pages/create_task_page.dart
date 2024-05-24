@@ -1,4 +1,4 @@
-import 'package:bee_note_application/widgets/formulario_proyecto.dart';
+import 'package:bee_note_application/widgets/formulario_task.dart';
 import 'package:flutter/material.dart';
 
 class CreateTaskScreen extends StatelessWidget {
@@ -31,7 +31,7 @@ class CreateTaskScreen extends StatelessWidget {
       body: const SingleChildScrollView(
         child: Column(
           children: [
-            FormProyect(name: 'Nombre de tarea', showMyTextFormField: true,)
+            FormTask(name: 'Nombre de tarea', showMyTextFormField: true,)
           ],
         ),
       ) 
