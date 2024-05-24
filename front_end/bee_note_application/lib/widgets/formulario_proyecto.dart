@@ -7,7 +7,7 @@ import 'dart:typed_data';
 import 'package:bee_note_application/widgets/widgsts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:bee_note_application/data/project.dart';
+
 class FormProyect extends StatefulWidget {
 
   final String name;

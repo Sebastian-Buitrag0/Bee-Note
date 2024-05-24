@@ -11,12 +11,12 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateNombreUsuario(String value) {
+  void updateNombreUsuario(String? value) {
     nombreUsuario = value;
     notifyListeners();
   }
 
-  void updatePassword(String value) {
+  void updatePassword(String? value) {
     password = value;
     notifyListeners();
   }

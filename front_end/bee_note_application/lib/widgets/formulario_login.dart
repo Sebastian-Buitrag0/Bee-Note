@@ -1,7 +1,10 @@
 import "package:bee_note_application/connection/api_service.dart";
+import "package:bee_note_application/providers/user_provider.dart";
 import "package:bee_note_application/widgets/widgsts.dart";
 import "package:flutter/material.dart";
 import 'package:dio/dio.dart';
+import "package:provider/provider.dart";
+
 class FormLogin extends StatefulWidget {
   const FormLogin({super.key});
 
@@ -35,11 +38,18 @@ class _FormLoginState extends State<FormLogin> {
 
       try {
         final response = await ApiService.login(username, password);
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+        userProvider.updateNombreUsuario(username);
+        userProvider.updatePassword(password);
+
         Navigator.pushReplacementNamed(context, 'home');
+
       } catch (e) {
-        print('Error: $e');
-        print(e.toString());
-        print(e is DioError); // true
+        
+        // print('Error: $e');
+        // print(e.toString());
+        // print(e is DioError); // true
 
         String errorMessage = 'Ocurrió un error durante el inicio de sesión. Por favor, intenta nuevamente.';
 

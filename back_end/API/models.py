@@ -34,6 +34,18 @@ class UsuarioManager(BaseUserManager):
     
         return self.create_user(nombreUsuario, password, **extra_fields)
     
+class Recurso(models.Model):
+    id = models.AutoField(primary_key=True)
+    nombre = models.CharField(max_length=64)
+    tipo = models.CharField(max_length=64)
+    url = models.URLField(default='https://ibb.co/yy6Kbjz')
+    tamaño = models.PositiveIntegerField()
+    fechaSubida = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.nombre+' - '+self.tipo+' - '+self.contribuidor.nombreUsuario
+
+    
 class Usuario(AbstractBaseUser,PermissionsMixin):
     id = models.AutoField(primary_key=True)
     nombreUsuario = models.CharField(max_length=64, unique=True, null=False, blank=False)
@@ -41,6 +53,7 @@ class Usuario(AbstractBaseUser,PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     datosPersonales = models.ForeignKey(Persona, on_delete=models.CASCADE)
+    imagenPerfil = models.ForeignKey(Recurso, on_delete=models.SET_NULL, null=True)
 
     USERNAME_FIELD = 'nombreUsuario'
 
@@ -49,7 +62,6 @@ class Usuario(AbstractBaseUser,PermissionsMixin):
     def __str__(self):
         return self.nombreUsuario
     
-
 class Tipo(models.Model):
     id = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=64)
@@ -81,19 +93,6 @@ class Prioridad(models.Model):
 
     def __str__(self):
         return self.nombre
-
-class Recurso(models.Model):
-    id = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=64)
-    tipo = models.CharField(max_length=64)
-    link = models.CharField(max_length=256)
-    tamaño = models.BinaryField()
-    contribuidor = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    fechaSubida = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.nombre+' - '+self.tipo+' - '+self.contribuidor.nombreUsuario
-
 
 class Proyecto(models.Model):
     id = models.AutoField(primary_key=True)

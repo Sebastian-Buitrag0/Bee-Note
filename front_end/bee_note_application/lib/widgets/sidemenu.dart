@@ -1,7 +1,18 @@
+import 'package:bee_note_application/connection/api_service.dart';
+import 'package:bee_note_application/providers/user_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SideMenu extends StatelessWidget {
-  const SideMenu({super.key});
+
+  final String? nomrbeUsuario;
+  final String? password;
+
+  const SideMenu({
+    super.key, 
+    required this.nomrbeUsuario, 
+    required this.password
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -11,7 +22,7 @@ class SideMenu extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _BuidHeader(), 
+            _BuidHeader(nombreUsuario: nomrbeUsuario,), 
             _BuildMeniItems()
           ],
         ),
@@ -22,21 +33,25 @@ class SideMenu extends StatelessWidget {
 }
 
 class _BuidHeader extends StatelessWidget {
+  final String? nombreUsuario;
+
+  const _BuidHeader({required this.nombreUsuario});
+
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-      child: const Column(
+      child: Column(
         children: [
-          CircleAvatar(
+          const CircleAvatar(
             radius: 52,
             backgroundImage: AssetImage('assets/img/defauls_avatar_img.png'),
             backgroundColor: Color(0xFFFED430),
           ),
-          SizedBox(height: 12,),
+          const SizedBox(height: 12,),
           Text(
-            'UserName',
-            style: TextStyle(
+            nombreUsuario ?? 'Usuaeio',
+            style: const TextStyle(
               fontFamily: 'Letters_for_Learners',
               fontSize: 40,
               color: Colors.white
@@ -49,8 +64,12 @@ class _BuidHeader extends StatelessWidget {
 }
 
 class _BuildMeniItems extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
+
+    final userProvider  = Provider.of<UserProvider>(context);
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 25),
       child: Column(
@@ -69,7 +88,7 @@ class _BuildMeniItems extends StatelessWidget {
       
           ListTile(
             leading: const Icon(
-              Icons.home_filled,
+              Icons.logout,
               color: Colors.white,
               size: 40,
             ),
@@ -81,7 +100,13 @@ class _BuildMeniItems extends StatelessWidget {
                 color: Colors.white
               ),
             ),
-            onTap: () {},
+            onTap: () async {
+              await ApiService.logout();
+              userProvider.updateNombreUsuario(null);
+              userProvider.updatePassword(null);
+
+              Navigator.pushReplacementNamed(context, 'login');
+            },
           ),
 
           ListTile(
