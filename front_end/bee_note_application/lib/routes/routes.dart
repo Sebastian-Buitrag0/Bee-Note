@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:bee_note_application/pages/collaborator_page.dart';
-import 'package:bee_note_application/pages/create_task_page.dart';
 import 'package:bee_note_application/pages/home_page.dart';
 import 'package:bee_note_application/pages/login_page.dart';
 import 'package:bee_note_application/pages/create_project_page.dart';
@@ -14,5 +13,4 @@ final Map<String, Widget Function(BuildContext)> appRoutes = {
   'home': (_) => const HomePage(), 
   'create_project': (_) => const CreateProjectScreen(), 
   'collaborator': (_) => const CollaboratorPage(), 
-  'create_task': (_) => const CreateTaskScreen(), 
   };

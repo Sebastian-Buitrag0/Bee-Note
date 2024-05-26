@@ -1,3 +1,5 @@
+import 'package:bee_note_application/pages/create_task_page.dart';
+import 'package:bee_note_application/providers/project_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:bee_note_application/data/project.dart';
 import 'package:bee_note_application/data/task.dart';
@@ -5,11 +7,12 @@ import 'package:bee_note_application/ui/bottom_tap_bar.dart';
 import 'package:bee_note_application/widgets/widgsts.dart';
 import 'package:bee_note_application/connection/api_service.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class TaskPage extends StatefulWidget {
   final Proyecto project;
 
-  const TaskPage({Key? key, required this.project}) : super(key: key);
+  const TaskPage({super.key, required this.project});
 
   @override
   _TaskPageState createState() => _TaskPageState();
@@ -21,19 +24,24 @@ class _TaskPageState extends State<TaskPage> {
   @override
   void initState() {
     super.initState();
-    _getTareas();
+    print(widget.project.id);
+    _getTareas(widget.project);
   }
 
-  Future<void> _getTareas() async {
-  try {
-    final tareas = await ApiService.getTareasPorProyecto(widget.project.id);
-    setState(() {
-      _tareas = tareas.where((tarea) => tarea.idProyecto == widget.project.id).toList();
-    });
-  } catch (e) {
-    print('Error al obtener las tareas: $e');
+  Future<void> _getTareas(Proyecto proyecto) async {
+    final projectId = widget.project.id;
+
+    try {
+      final tareas = await ApiService.getTareasPorProyecto(projectId);
+      setState(() {
+        _tareas = tareas;
+      });
+    } catch (e) {
+      print('Error al obtener las tareas: $e');
+    }
+      
   }
-}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,8 +67,10 @@ class _TaskPageState extends State<TaskPage> {
         itemCount: _tareas.length,
         itemBuilder: (BuildContext context, int index) {
           final task = _tareas[index];
-          final formattedStartDate = DateFormat('yyyy-MM-dd').format(task.fechaInicio);
-          final formattedEndDate = DateFormat('yyyy-MM-dd').format(task.fechaFin);
+          final formattedStartDate =
+              DateFormat('yyyy-MM-dd').format(task.fechaInicio);
+          final formattedEndDate =
+              DateFormat('yyyy-MM-dd').format(task.fechaFin);
 
           return buildTaskListTile(task, formattedStartDate, formattedEndDate);
         },
@@ -77,22 +87,25 @@ class _TaskPageState extends State<TaskPage> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: HexagonalButton(
-  onTap: () {
-    Navigator.pushNamed(
-      context,
-      'create_task',
-      arguments: {'projectId': widget.project.id},
-    );
-  },
-  iconData: Icons.add,
-  sizewidth: 90,
-  sizeHeight: 60,
-),
-
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => CreateTaskScreen(proyecto: widget.project.id)),
+          ).then((refreshTask){
+            if(refreshTask == true){
+              _getTareas(widget.project);
+            }
+          });
+        },
+        iconData: Icons.add,
+        sizewidth: 90,
+        sizeHeight: 60,
+      ),
     );
   }
 
-  Padding buildTaskListTile(Tarea task, String formattedStartDate, String formattedEndDate) {
+  Padding buildTaskListTile(
+      Tarea task, String formattedStartDate, String formattedEndDate) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(

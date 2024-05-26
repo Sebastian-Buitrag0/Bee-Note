@@ -2,14 +2,14 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:bee_note_application/data/project.dart';
 import 'package:bee_note_application/data/task.dart';
-import 'dart:convert';
 
 class ApiService {
-  static const String baseUrl = 'http://127.0.0.1:8000/api';
+  static const String baseUrl = 'http://10.0.2.2:8000/api';
   static final Dio _dio = Dio();
 
   // Método para iniciar sesión
-  static Future<Map<String, dynamic>> login(String username, String password) async {
+  static Future<Map<String, dynamic>> login(
+      String username, String password) async {
     try {
       final response = await _dio.post(
         '$baseUrl/token/',
@@ -26,11 +26,13 @@ class ApiService {
         await _storeTokens(accessToken, refreshToken);
         return responseData;
       } else {
-        throw Exception('Error al iniciar sesión, usuario o contraseña incorrectos');
+        throw Exception(
+            'Error al iniciar sesión, usuario o contraseña incorrectos');
       }
     } on DioError catch (e) {
       if (e.response != null) {
-        throw Exception('Error al iniciar sesión: ${e.response?.data['detail']}');
+        throw Exception(
+            'Error al iniciar sesión: ${e.response?.data['detail']}');
       } else {
         throw Exception('Error al conectar con el servidor');
       }
@@ -38,7 +40,8 @@ class ApiService {
   }
 
   // Método para almacenar los tokens de forma segura
-  static Future<void> _storeTokens(String accessToken, String refreshToken) async {
+  static Future<void> _storeTokens(
+      String accessToken, String refreshToken) async {
     final storage = FlutterSecureStorage();
     await storage.write(key: 'access_token', value: accessToken);
     await storage.write(key: 'refresh_token', value: refreshToken);
@@ -75,7 +78,8 @@ class ApiService {
       }
     } on DioError catch (e) {
       if (e.response != null) {
-        throw Exception('Error al obtener los proyectos: ${e.response?.data['detail']}');
+        throw Exception(
+            'Error al obtener los proyectos: ${e.response?.data['detail']}');
       } else {
         throw Exception('Error al conectar con el servidor');
       }
@@ -151,7 +155,8 @@ class ApiService {
       }
     } on DioError catch (e) {
       if (e.response != null) {
-        throw Exception('Error al crear el proyecto: ${e.response?.data['detail']}');
+        throw Exception(
+            'Error al crear el proyecto: ${e.response?.data['detail']}');
       } else {
         throw Exception('Error al conectar con el servidor');
       }
@@ -174,12 +179,12 @@ class ApiService {
   }
 
   static Future<void> createTarea(
+    int proyectoId,
     String nombre,
     String descripcion,
-    DateTime fechaInicio,
-    DateTime fechaFin,
+    String fechaInicio,
+    String fechaFin,
     int estado,
-    int idProyecto,
     int prioridad,
   ) async {
     print('Creando tarea');
@@ -188,13 +193,13 @@ class ApiService {
       final response = await _dio.post(
         '$baseUrl/tarea/',
         data: {
+          'proyecto': proyectoId,
           'nombre': nombre,
           'descripcion': descripcion,
-          'fechaInicio': fechaInicio.toIso8601String(),
-          'fechaFin': fechaFin.toIso8601String(),
           'estado': estado,
-          'idProyecto': idProyecto,
           'prioridad': prioridad,
+          'fechaInicio': fechaInicio,
+          'fechaFin': fechaFin,
         },
         options: Options(
           headers: {'Authorization': 'Bearer $accessToken'},
@@ -208,35 +213,34 @@ class ApiService {
       }
     } on DioError catch (e) {
       if (e.response != null) {
-        throw Exception('Error al crear la tarea: ${e.response?.data['detail']}');
+        throw Exception(
+            'Error al crear la tarea: ${e.response?.data['detail']}');
       } else {
         throw Exception('Error al conectar con el servidor');
       }
     }
   }
 
-  static Future<List<Tarea>> getTareasPorProyecto(int projectId) async {
+  static Future<List<Tarea>> getTareasPorProyecto(int proyectoId) async {
     try {
       final accessToken = await getAccessToken();
       final response = await _dio.get(
-        '$baseUrl/tarea/?idProyecto=$projectId',
+        '$baseUrl/tarea/',
+        queryParameters: {'proyecto': proyectoId},
         options: Options(
           headers: {'Authorization': 'Bearer $accessToken'},
         ),
       );
-
       if (response.statusCode == 200) {
-        final jsonData = response.data as List<dynamic>;
-        return jsonData.map((json) => Tarea.fromJson(json)).toList();
+        final tareasData = response.data as List<dynamic>;
+        final tareas = tareasData.map((json) => Tarea.fromJson(json)).toList();
+        return tareas;
       } else {
-        throw Exception('Error al obtener las tareas');
+        throw Exception('Error al obtener las tareas del proyecto');
       }
-    } on DioError catch (e) {
-      if (e.response != null) {
-        throw Exception('Error al obtener las tareas: ${e.response?.data['detail']}');
-      } else {
-        throw Exception('Error al conectar con el servidor');
-      }
+    } catch (e) {
+      print('Error al obtener las tareas del proyecto: $e');
+      throw Exception('Error al obtener las tareas del proyecto');
     }
   }
 }

@@ -53,6 +53,8 @@ class GroupSerializer(serializers.ModelSerializer):
         read_only_fields = ('id','name','descripcion',)
 
 class TareaSerializer(serializers.ModelSerializer):
+    proyecto = serializers.PrimaryKeyRelatedField(queryset = Proyecto.objects.all())
+
     class Meta:
         model = Tarea
         fields = '__all__'

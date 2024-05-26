@@ -72,18 +72,19 @@ class TareaViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         usuario = self.request.user
-        proyecto_id = self.kwargs.get('proyecto_id')
-    
+        proyecto_id = self.request.query_params.get('proyecto')
+
         if proyecto_id:
-            proyectos_usuario = Proyecto.objects.filter(groupusuarioproyecto__idUsuario=usuario, id=proyecto_id)
-            return Tarea.objects.filter(idProyecto__in=proyectos_usuario)
+            proyecto = get_object_or_404(Proyecto, id=proyecto_id, groupusuarioproyecto__idUsuario=usuario)
+            return Tarea.objects.filter(proyecto=proyecto)
         else:
-            proyectos_usuario = Proyecto.objects.filter(groupusuarioproyecto__idUsuario=usuario)
-            return Tarea.objects.filter(idProyecto__in=proyectos_usuario)
+            return Tarea.objects.none()
 
     def create(self, request, *args, **kwargs):
         usuario_actual = request.user
-        proyecto = get_object_or_404(Proyecto, id=request.data.get('idProyecto'))
+        proyecto_id = request.data.get('proyecto')
+
+        proyecto = get_object_or_404(Proyecto, id=proyecto_id)
 
         if not GroupUsuarioProyecto.objects.filter(
             idUsuario=usuario_actual,

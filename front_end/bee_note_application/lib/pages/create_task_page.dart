@@ -1,15 +1,19 @@
+import 'package:bee_note_application/data/project.dart';
 import 'package:bee_note_application/widgets/formulario_task.dart';
 import 'package:flutter/material.dart';
 
 class CreateTaskScreen extends StatelessWidget {
-  const CreateTaskScreen({super.key});
+
+  final int proyecto;
+
+  const CreateTaskScreen({super.key, required this.proyecto});
+
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: const Color(0xFFF0F0F0),
-
-
       appBar: AppBar(
         backgroundColor: const Color(0xFFFED430),
         toolbarHeight: 85,
@@ -28,10 +32,14 @@ class CreateTaskScreen extends StatelessWidget {
         centerTitle: true,
       ),
 
-      body: const SingleChildScrollView(
+      body: SingleChildScrollView(
         child: Column(
           children: [
-            FormTask(name: 'Nombre de tarea', showMyTextFormField: true,)
+            FormTask(
+              name: 'Nombre de tarea', 
+              showMyTextFormField: true,
+              idPoryecto: proyecto,
+            )
           ],
         ),
       ) 

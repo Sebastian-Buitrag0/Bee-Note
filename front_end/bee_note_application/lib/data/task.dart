@@ -1,7 +1,3 @@
-// To parse this JSON data, do
-//
-//     final tareas = tareasFromJson(jsonString);
-
 import 'dart:convert';
 
 List<Tarea> tareasFromJson(String str) => List<Tarea>.from(json.decode(str).map((x) => Tarea.fromJson(x)));
@@ -15,7 +11,7 @@ class Tarea {
     DateTime fechaCreacion;
     DateTime fechaInicio;
     DateTime fechaFin;
-    int idProyecto;
+    int proyecto;
     int estado;
     int prioridad;
 
@@ -26,7 +22,7 @@ class Tarea {
         required this.fechaCreacion,
         required this.fechaInicio,
         required this.fechaFin,
-        required this.idProyecto,
+        required this.proyecto,
         required this.estado,
         required this.prioridad,
     });
@@ -38,7 +34,7 @@ class Tarea {
         fechaCreacion: DateTime.parse(json["fechaCreacion"]),
         fechaInicio: DateTime.parse(json["fechaInicio"]),
         fechaFin: DateTime.parse(json["fechaFin"]),
-        idProyecto: json["idProyecto"],
+        proyecto: json["proyecto"],
         estado: json["estado"],
         prioridad: json["prioridad"],
     );
@@ -50,7 +46,7 @@ class Tarea {
         "fechaCreacion": fechaCreacion.toIso8601String(),
         "fechaInicio": fechaInicio.toIso8601String(),
         "fechaFin": fechaFin.toIso8601String(),
-        "idProyecto": idProyecto,
+        "proyecto": proyecto,
         "estado": estado,
         "prioridad": prioridad,
     };

@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bee_note_application/providers/user_provider.dart';
+import 'package:bee_note_application/providers/project_provider.dart';
 import 'package:bee_note_application/routes/routes.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => UserProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => UserProvider(),),
+        ChangeNotifierProvider(create: (context) => ProjectProvider(),)
+      ],
       child: const MyApp(),
-    ),
+    )
   );
 }
 

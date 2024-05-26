@@ -95,6 +95,7 @@ class _HomePageState extends State<HomePage> {
         itemCount: _proyectos.length,
         itemBuilder: (BuildContext context, int index) {
           final project = _proyectos[index];
+          print(_proyectos[0].nombre);
           return GestureDetector(
             onTap: () => Navigator.push(
               context,
