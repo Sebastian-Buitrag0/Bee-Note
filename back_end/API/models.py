@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group
 
@@ -54,7 +55,7 @@ class Usuario(AbstractBaseUser,PermissionsMixin):
     is_superuser = models.BooleanField(default=False)
     datosPersonales = models.ForeignKey(Persona, on_delete=models.CASCADE)
     imagenPerfil = models.ForeignKey(Recurso, on_delete=models.SET_NULL, null=True, blank=True)
-
+    last_login = models.DateTimeField(default=datetime.now())
     USERNAME_FIELD = 'nombreUsuario'
 
     objects = UsuarioManager()

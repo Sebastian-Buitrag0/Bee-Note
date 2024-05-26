@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from .models import (Persona, Usuario, Registro, Proyecto, Tarea, Recurso, Estado, Tipo, Prioridad, 
@@ -12,6 +13,9 @@ from rest_framework.exceptions import PermissionDenied
 from django.contrib.auth.models import Group
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework import status
+from django.db.models import Q
+from django.contrib.auth.signals import user_logged_in
+from django.dispatch import receiver
 
 @api_view(['POST'])
 @authentication_classes([])
@@ -23,6 +27,10 @@ def registro(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+@receiver(user_logged_in)
+def update_last_login(sender, user, request, **kwargs):
+    Usuario.objects.filter(pk=user.pk).update(last_login=datetime.now())
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
@@ -113,16 +121,10 @@ class TareaViewSet(viewsets.ModelViewSet):
 
 class GroupUsuarioProyectoViewSet(viewsets.ModelViewSet):
     queryset = GroupUsuarioProyecto.objects.all()
-    permission_classes = [IsAuthenticated]
     serializer_class = GroupUsuarioProyectoSerializer
-
-    def get_queryset(self):
-        usuario = self.request.user
-        proyectos_usuario = Proyecto.objects.filter(groupusuarioproyecto__idUsuario=usuario)
-        return GroupUsuarioProyecto.objects.filter(idProyecto__in=proyectos_usuario)
+    permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
-        usuario_actual = request.user
         proyecto_id = request.data.get('idProyecto')
         usuario_id = request.data.get('idUsuario')
         group_id = request.data.get('idGroup')
@@ -132,39 +134,25 @@ class GroupUsuarioProyectoViewSet(viewsets.ModelViewSet):
             usuario = Usuario.objects.get(id=usuario_id)
             group = Group.objects.get(id=group_id)
         except (Proyecto.DoesNotExist, Usuario.DoesNotExist, Group.DoesNotExist):
-            return Response({'error': 'Proyecto, usuario o rol no encontrado'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Proyecto, usuario o grupo no encontrado'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if GroupUsuarioProyecto.objects.filter(
-            idUsuario=usuario_actual,
-            idProyecto=proyecto,
-            idGroup__permissions__codename='add_groupusuarioproyecto'
-        ).exists():
-            GroupUsuarioProyecto.objects.create(idGroup=group, idUsuario=usuario, idProyecto=proyecto)
-            return Response({'message': 'Usuario agregado al proyecto correctamente'}, status=status.HTTP_201_CREATED)
-        else:
-            return Response({'error': 'No tienes permiso para agregar usuarios a este proyecto'}, status=status.HTTP_403_FORBIDDEN)
-
-    def perform_update(self, serializer):
-        group_usuario_proyecto = self.get_object()
-        proyecto = group_usuario_proyecto.idProyecto
-        usuario_actual = self.request.user
-
-        if usuario_actual.has_perm('app_name.change_groupusuarioproyecto', proyecto):
-            serializer.save()
-        else:
-            raise PermissionDenied('No tienes permiso para editar roles en este proyecto')
-
-    def perform_destroy(self, instance):
-        proyecto = instance.idProyecto
-        usuario_actual = self.request.user
-
-        if usuario_actual.has_perm('app_name.delete_groupusuarioproyecto', proyecto):
-            instance.delete()
-        else:
-            raise PermissionDenied('No tienes permiso para eliminar roles en este proyecto')
-
+        GroupUsuarioProyecto.objects.create(idGroup=group, idUsuario=usuario, idProyecto=proyecto)
+        return Response({'message': 'Usuario agregado al proyecto correctamente'}, status=status.HTTP_201_CREATED)
 
 class RegistroUsuarioView(generics.CreateAPIView):
     queryset = Usuario.objects.all()
     serializer_class = RegistroUsuarioSerializer
     permission_classes = [AllowAny]
+
+
+class UsuariosPorInicialView(generics.ListAPIView):
+    serializer_class = UsuarioSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        inicial = self.request.query_params.get('inicial')
+        if inicial:
+            queryset = Usuario.objects.filter(nombreUsuario__istartswith=inicial)
+        else:
+            queryset = Usuario.objects.none()
+        return queryset
