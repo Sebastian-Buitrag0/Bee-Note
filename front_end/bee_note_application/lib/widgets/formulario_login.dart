@@ -39,23 +39,34 @@ class _FormLoginState extends State<FormLogin> {
       try {
         final response = await ApiService.login(username, password);
         final userProvider = Provider.of<UserProvider>(context, listen: false);
+        final usuarios = await ApiService.getUsuario();
 
-        userProvider.updateNombreUsuario(username);
-        userProvider.updatePassword(password);
+        if (usuarios.isNotEmpty) {
+          final usuario = usuarios[0];
+          userProvider.updateDatosPersonales(usuario.datosPersonales);
+          userProvider.updateNombreUsuario(usuario.nombreUsuario);
+          userProvider.updatePassword(usuario.password);
+          userProvider.updateImagenPerfil(usuario.imgUrl);
 
-        Navigator.pushReplacementNamed(context, 'home');
+          print(usuario.imgUrl.url.toString());
 
+          Navigator.pushReplacementNamed(context, 'home');
+        } else {
+          // Manejar el caso cuando no se encuentran usuarios
+          print('No se encontraron usuarios');
+        }
       } catch (e) {
-        
         // print('Error: $e');
         // print(e.toString());
         // print(e is DioError); // true
 
-        String errorMessage = 'Ocurrió un error durante el inicio de sesión. Por favor, intenta nuevamente.';
+        String errorMessage =
+            'Ocurrió un error durante el inicio de sesión. Por favor, intenta nuevamente.';
 
         if (e is DioError) {
           if (e.response?.statusCode == 401) {
-            errorMessage = 'Credenciales incorrectas. Por favor, verifica tu nombre de usuario y contraseña.';
+            errorMessage =
+                'Credenciales incorrectas. Por favor, verifica tu nombre de usuario y contraseña.';
           }
         }
 
@@ -88,7 +99,7 @@ class _FormLoginState extends State<FormLogin> {
       child: Column(
         children: [
           const SizedBox(height: 30),
-          
+
           // Nombre Usuario
           MyTextFormField(
             controller: userTextController,
@@ -100,7 +111,7 @@ class _FormLoginState extends State<FormLogin> {
                   : null;
             },
           ),
-          
+
           // Password
           MyTextFormField(
             controller: passwordTextController,
@@ -122,9 +133,9 @@ class _FormLoginState extends State<FormLogin> {
                   : 'La contraseña debe de ser de 6 caracteres';
             },
           ),
-          
+
           const SizedBox(height: 25),
-          
+
           // Botón Iniciar Sesión
           _isLoading
               ? const CircularProgressIndicator()
@@ -132,7 +143,7 @@ class _FormLoginState extends State<FormLogin> {
                   onTap: _login,
                   text: 'Iniciar Sesión',
                 ),
-          
+
           // Registrar
           GestureDetector(
             onTap: () {
@@ -141,7 +152,7 @@ class _FormLoginState extends State<FormLogin> {
             child: const SizedBox(
               child: Text(
                 'Regístrate',
-                  style: TextStyle(
+                style: TextStyle(
                   fontFamily: 'Letters_for_Learners',
                   fontSize: 30,
                   color: Color(0xFFF3753D),
@@ -149,7 +160,7 @@ class _FormLoginState extends State<FormLogin> {
               ),
             ),
           ),
-          
+
           const Text(
             'o',
             style: TextStyle(
@@ -158,9 +169,9 @@ class _FormLoginState extends State<FormLogin> {
               color: Color(0xFFF3753D),
             ),
           ),
-          
+
           const SizedBox(height: 10),
-          
+
           // Botón de registro con Google
           MyButtonGoogle(
             onTap: () {},

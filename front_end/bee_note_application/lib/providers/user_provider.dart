@@ -1,12 +1,13 @@
+import 'package:bee_note_application/data/recurso.dart';
 import 'package:flutter/foundation.dart';
-import 'package:bee_note_application/data/datos_personales.dart'; // Asegúrate de que este es el camino correcto al modelo
+import 'package:bee_note_application/data/datos_personales.dart';
 
 class UserProvider extends ChangeNotifier {
   int? usuarioId;
   DatosPersonales? datosPersonales;
   String? nombreUsuario;
   String? password;
-  String? imagenPerfilUrl;
+  Recurso? imagenPerfil;
 
   void updateUsuarioId(int value) {
     usuarioId = value;
@@ -28,8 +29,8 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateImagenPerfilUrl(String? value) {
-    imagenPerfilUrl = value;
+  void updateImagenPerfil(Recurso? value) {
+    imagenPerfil = value;
     notifyListeners();
   }
 }

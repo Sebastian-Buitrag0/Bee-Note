@@ -14,7 +14,9 @@ class SideMenu extends StatelessWidget {
 
     final userProvider = Provider.of<UserProvider>(context);
     final nombreUsuario = userProvider.nombreUsuario;
-    final imagenUrl = userProvider.imagenPerfilUrl;
+    final imagenUrl = userProvider.imagenPerfil?.url;
+
+    print('url de la imagen: $imagenUrl (sidemenu)');
 
     return Drawer(
       backgroundColor: const Color(0xFFFED430),

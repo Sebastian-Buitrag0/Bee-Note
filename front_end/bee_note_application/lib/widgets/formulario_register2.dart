@@ -99,7 +99,7 @@ class _FormRegister2State extends State<FormRegister2> {
 
                 if (datosPersonales != null) {
                   try {
-                    final imagenPerfilUrl = userProvider.imagenPerfilUrl;
+                    final imagenPerfilUrl = userProvider.imagenPerfil?.url;
                     // Llamar al método registerUser de ApiService
                     await ApiService.registerUser(
                       datosPersonales.nombre,

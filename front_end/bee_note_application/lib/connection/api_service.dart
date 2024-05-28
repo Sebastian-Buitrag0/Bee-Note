@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:bee_note_application/data/user.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:bee_note_application/data/project.dart';
@@ -260,6 +263,31 @@ class ApiService {
     } catch (e) {
       print('Error al obtener las tareas del proyecto: $e');
       throw Exception('Error al obtener las tareas del proyecto');
+    }
+  }
+
+  static Future<List<User>> getUsuario() async{
+    try {
+      final accessToken = await getAccessToken();
+      final response = await _dio.get(
+        '$baseUrl/usuario',
+        options: Options(
+          headers: {'Authorization': 'Bearer $accessToken'},
+        )
+      );
+      if(response.statusCode == 200){
+        final userData = response.data as List<dynamic>;
+        return userData.map((json) => User.fromJson(json)).toList();
+      } else {
+        throw Exception('Error al obtener a l usuario');
+      }
+    } on DioError catch (e) {
+      if (e.response != null) {
+        throw Exception(
+            'Error al obtener los proyectos: ${e.response?.data['detail']}');
+      } else {
+        throw Exception('Error al conectar con el servidor');
+      }
     }
   }
 }
