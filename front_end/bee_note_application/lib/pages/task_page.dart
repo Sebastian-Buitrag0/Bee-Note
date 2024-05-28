@@ -1,5 +1,4 @@
 import 'package:bee_note_application/pages/create_task_page.dart';
-import 'package:bee_note_application/providers/project_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:bee_note_application/data/project.dart';
 import 'package:bee_note_application/data/task.dart';
@@ -7,7 +6,6 @@ import 'package:bee_note_application/ui/bottom_tap_bar.dart';
 import 'package:bee_note_application/widgets/widgsts.dart';
 import 'package:bee_note_application/connection/api_service.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 
 class TaskPage extends StatefulWidget {
   final Proyecto project;

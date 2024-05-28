@@ -5,26 +5,24 @@ import 'package:provider/provider.dart';
 
 class SideMenu extends StatelessWidget {
 
-  final String? nomrbeUsuario;
-  final String? password;
-  final String? imagenPerfilUrl;
-
   const SideMenu({
     super.key, 
-    required this.nomrbeUsuario, 
-    required this.password, 
-    required this.imagenPerfilUrl
   });
 
   @override
   Widget build(BuildContext context) {
+
+    final userProvider = Provider.of<UserProvider>(context);
+    final nombreUsuario = userProvider.nombreUsuario;
+    final imagenUrl = userProvider.imagenPerfilUrl;
+
     return Drawer(
       backgroundColor: const Color(0xFFFED430),
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _BuidHeader(nombreUsuario: nomrbeUsuario, imagenPerfilUrl: imagenPerfilUrl,), 
+            _BuidHeader(nombreUsuario: nombreUsuario, imagenPerfilUrl: imagenUrl,), 
             _BuildMeniItems()
           ],
         ),
@@ -50,7 +48,7 @@ class _BuidHeader extends StatelessWidget {
             radius: 52,
             backgroundImage: imagenPerfilUrl != null
                 ? NetworkImage(imagenPerfilUrl!)
-                : const AssetImage('assets/img/defauls_avatar_img.png') as ImageProvider<Object>?,
+                : const AssetImage('assets/img/default_avatar_img.png') as ImageProvider<Object>?,
             backgroundColor: const Color(0xFFFED430),
           ),
           const SizedBox(height: 12,),
@@ -107,8 +105,8 @@ class _BuildMeniItems extends StatelessWidget {
             ),
             onTap: () async {
               await ApiService.logout();
-              userProvider.updateNombreUsuario(null);
-              userProvider.updatePassword(null);
+              userProvider.updateNombreUsuario('');
+              userProvider.updatePassword('');
 
               Navigator.pushReplacementNamed(context, 'login');
             },

@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:bee_note_application/connection/api_service.dart';
 import 'package:bee_note_application/providers/user_provider.dart';
 import 'package:http/http.dart' as http;
 
@@ -18,7 +17,6 @@ class RegisterPage2 extends StatefulWidget {
 }
 
 class _RegisterState extends State<RegisterPage2> {
-
   Uint8List? _image;
   File? selectedImage;
 
@@ -27,26 +25,25 @@ class _RegisterState extends State<RegisterPage2> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: const Color(0xFFFED430),
-      
       body: SafeArea(
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Stack(
-
                 children: [
-                  _image != null ? CircleAvatar(
-                    radius: 65,
-                    backgroundImage: MemoryImage(_image!),
-                  ):
-                  const CircleAvatar(
-                    radius: 65,
-                    backgroundColor: Color(0xFFFED430),
-                    backgroundImage: AssetImage('assets/img/defauls_avatar_img.png'),
-                  ),
+                  _image != null
+                      ? CircleAvatar(
+                          radius: 65,
+                          backgroundImage: MemoryImage(_image!),
+                        )
+                      : const CircleAvatar(
+                          radius: 65,
+                          backgroundColor: Color(0xFFFED430),
+                          backgroundImage:
+                              AssetImage('assets/img/defauls_avatar_img.png'),
+                        ),
                 ],
-                
               ),
 
               GestureDetector(
@@ -60,15 +57,16 @@ class _RegisterState extends State<RegisterPage2> {
                       Text(
                         'Subir foto',
                         style: TextStyle(
-                          fontFamily: 'Letters_for_Learners',
-                          fontSize: 30,
-                          color: Color(0xFF3b486a),
-                          decoration: TextDecoration.underline,
-                          decorationColor: Color(0xFF3b486a)
-                        ),
+                            fontFamily: 'Letters_for_Learners',
+                            fontSize: 30,
+                            color: Color(0xFF3b486a),
+                            decoration: TextDecoration.underline,
+                            decorationColor: Color(0xFF3b486a)),
                       ),
-                      Icon(Icons.upload_file, color: Color(0xFF3b486a),),
-                      
+                      Icon(
+                        Icons.upload_file,
+                        color: Color(0xFF3b486a),
+                      ),
                     ],
                   ),
                 ),
@@ -80,70 +78,73 @@ class _RegisterState extends State<RegisterPage2> {
           ),
         ),
       ),
-
     );
   }
 
   // Mostrar imagen en Avatar
-  void showImagePckerOption(BuildContext context){
+  void showImagePckerOption(BuildContext context) {
     showModalBottomSheet(
-      backgroundColor: Colors.amber[200],
-      context: context, 
-      builder: (builder){
-
-        return Padding(
-          padding: const EdgeInsets.all(28.0),
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height / 6.5,
-            child: Row(
-              children: [
-                
-                Expanded(
-                  child: InkWell(
-                    onTap: (){
-                      _pickerImageFromGallery();
-                    },
-                    child: const SizedBox(
-                      child: Column(
-                        children: [
-                          Icon(Icons.image, size: 70,color: Color(0xFF3b486a),),
-                          Text('Galeria')
-                        ],
+        backgroundColor: Colors.amber[200],
+        context: context,
+        builder: (builder) {
+          return Padding(
+            padding: const EdgeInsets.all(28.0),
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height / 6.5,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        _pickerImageFromGallery();
+                      },
+                      child: const SizedBox(
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.image,
+                              size: 70,
+                              color: Color(0xFF3b486a),
+                            ),
+                            Text('Galeria')
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-          
-                Expanded(
-                  child: InkWell(
-                    onTap: (){
-                      _pickerImageFromCamera();
-                    },
-                    child: const SizedBox(
-                      child: Column(
-                        children: [
-                          Icon(Icons.camera_alt, size: 70,color: Color(0xFF3b486a),),
-                          Text('Camara')
-                        ],
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        _pickerImageFromCamera();
+                      },
+                      child: const SizedBox(
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.camera_alt,
+                              size: 70,
+                              color: Color(0xFF3b486a),
+                            ),
+                            Text('Camara')
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                )
-
-              ],
+                  )
+                ],
+              ),
             ),
-          ),
-        );
-      }
-    );
+          );
+        });
   }
 
   // Cargar imagen de galeria
-  Future _pickerImageFromGallery() async{
-    final returnImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+  Future _pickerImageFromGallery() async {
+    final returnImage =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
 
-    if(returnImage == null) return;
+    if (returnImage == null) return;
 
     setState(() {
       selectedImage = File(returnImage.path);
@@ -151,20 +152,22 @@ class _RegisterState extends State<RegisterPage2> {
     });
 
     final imageUrl = await cargarImg(selectedImage!);
-    if(imageUrl != null){
-      print('url de la imagen $imageUrl');
+    if (imageUrl != null) {
+      print('URL de la imagen: $imageUrl');
       final userProvider = Provider.of<UserProvider>(context, listen: false);
-      userProvider.updateImagePerfilUrl(imageUrl);
+      userProvider.updateImagenPerfilUrl(imageUrl);
+      // No es necesario llamar a ApiService.updateImagenPerfilUrl aquí
     }
 
     Navigator.of(context).pop();
   }
 
   // Cargar imagen de foto
-  Future _pickerImageFromCamera() async{
-    final returnImage = await ImagePicker().pickImage(source: ImageSource.camera);
+  Future _pickerImageFromCamera() async {
+    final returnImage =
+        await ImagePicker().pickImage(source: ImageSource.camera);
 
-    if(returnImage == null) return;
+    if (returnImage == null) return;
 
     setState(() {
       selectedImage = File(returnImage.path);
@@ -172,10 +175,11 @@ class _RegisterState extends State<RegisterPage2> {
     });
 
     final imageUrl = await cargarImg(selectedImage!);
-    if(imageUrl != null){
-      print('url de la imagen $imageUrl');
+    if (imageUrl != null) {
+      print('URL de la imagen: $imageUrl');
       final userProvider = Provider.of<UserProvider>(context, listen: false);
-      userProvider.updateImagePerfilUrl(imageUrl);
+      userProvider.updateImagenPerfilUrl(imageUrl);
+      // No es necesario llamar a ApiService.updateImagenPerfilUrl aquí
     }
 
     Navigator.of(context).pop();
@@ -189,18 +193,17 @@ class _RegisterState extends State<RegisterPage2> {
     final file = await http.MultipartFile.fromPath('image', imgeFile.path);
     request.files.add(file);
     final response = await request.send();
-    
+
     if (response.statusCode == 200) {
       final responseData = await response.stream.bytesToString();
       final data = json.decode(responseData);
       final imageUrl = data['data']['url'];
-      
+
       // Enviar la URL de la imagen al servidor Django
-      await ApiService.updateImagenPerfilUrl(imageUrl);
-      
+      // await ApiService.updateImagenPerfilUrl(imageUrl);
+
       return imageUrl;
     }
     return null;
   }
-
 }

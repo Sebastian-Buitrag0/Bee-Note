@@ -41,14 +41,14 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
 
-    final userProvider = Provider.of<UserProvider>(context);
-    final nombreUsuario = userProvider.nombreUsuario; 
-    final password = userProvider.password;
-    final imagenPerfilUrl = userProvider.imagenPerfilUrl;
+    // final userProvider = Provider.of<UserProvider>(context);
+    // final nombreUsuario = userProvider.nombreUsuario; 
+    // final password = userProvider.password;
+    // final imagenPerfilUrl = userProvider.imagenPerfilUrl;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF0F0F0),
-      drawer: SideMenu(nomrbeUsuario: nombreUsuario, password: password, imagenPerfilUrl: imagenPerfilUrl,),
+      drawer: const SideMenu(),
       appBar: AppBar(
         backgroundColor: const Color(0xFFFED430),
         toolbarHeight: 85,

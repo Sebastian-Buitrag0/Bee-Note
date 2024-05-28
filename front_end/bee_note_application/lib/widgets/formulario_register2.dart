@@ -36,7 +36,9 @@ class _FormRegister2State extends State<FormRegister2> {
             hintText: 'Usuario',
             obscureText: false,
             validator: (value) {
-              return (value == null || value.isEmpty) ? 'El campo no puede estar vacio' : null;
+              return (value == null || value.isEmpty)
+                  ? 'El campo no puede estar vacio'
+                  : null;
             },
           ),
 
@@ -51,10 +53,13 @@ class _FormRegister2State extends State<FormRegister2> {
                   _obscureText1 = !_obscureText1;
                 });
               },
-              child: Icon(_obscureText1 ? Icons.visibility : Icons.visibility_off),
+              child:
+                  Icon(_obscureText1 ? Icons.visibility : Icons.visibility_off),
             ),
             validator: (value) {
-              return (value != null && value.length >= 6) ? null : 'La contraseña debe de ser de 6 caracteres';
+              return (value != null && value.length >= 6)
+                  ? null
+                  : 'La contraseña debe de ser de 6 caracteres';
             },
           ),
 
@@ -69,78 +74,88 @@ class _FormRegister2State extends State<FormRegister2> {
                   _obscureText2 = !_obscureText2;
                 });
               },
-              child: Icon(_obscureText2 ? Icons.visibility : Icons.visibility_off),
+              child:
+                  Icon(_obscureText2 ? Icons.visibility : Icons.visibility_off),
             ),
             validator: (value) {
-              return (value != null && value == passWordTextController.text) ? null : 'Las contraseñas no coinciden';
+              return (value != null && value == passWordTextController.text)
+                  ? null
+                  : 'Las contraseñas no coinciden';
             },
           ),
 
           // Boton Registrar
           const SizedBox(height: 30),
           HexagonalButton(
-  onTap: () async {
-    print('Registrar');
-    if (_formState.currentState!.validate()) {
-      // Obtener los datos del UserProvider
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
-      final datosPersonales = userProvider.datosPersonales;
-      print('datosPersonales: $datosPersonales');
-      if (datosPersonales != null) {
-        try {
-          // Llamar al método registerUser de ApiService
-          await ApiService.registerUser(
-            datosPersonales.nombre,
-            datosPersonales.apellido,
-            datosPersonales.correo,
-            datosPersonales.telefono,
-            datosPersonales.fechaNacimiento,
-            userTextController.text,
-            passWordTextController.text,
-          );
+            onTap: () async {
+              print('Registrar');
+              if (_formState.currentState!.validate()) {
+                // Obtener los datos del UserProvider
+                final userProvider =
+                    Provider.of<UserProvider>(context, listen: false);
+                final datosPersonales = userProvider.datosPersonales;
 
-          
-          Navigator.restorablePushNamed(context, 'login');
-        } catch (e) {
-          // Manejar el error de registro
-          print('Error al registrar el usuario: $e');
-          // Mostrar un mensaje de error al usuario
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: Text('Error'),
-              content: Text('Ocurrió un error al registrar el usuario. Por favor, inténtalo de nuevo.'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pushNamed(context, 'home'),
-                  child: Text('OK'),
-                ),
-              ],
-            ),
-          );
-        }
-      } else {
-        // Manejar el caso en que datosPersonales sea nulo
-        print('Los datos personales no están completos');
-        // Mostrar un mensaje de error al usuario
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Error'),
-            content: Text('Por favor, completa todos los datos personales antes de registrarte.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text('OK'),
-              ),
-            ],
+                print('datosPersonales: $datosPersonales');
+
+                if (datosPersonales != null) {
+                  try {
+                    final imagenPerfilUrl = userProvider.imagenPerfilUrl;
+                    // Llamar al método registerUser de ApiService
+                    await ApiService.registerUser(
+                      datosPersonales.nombre,
+                      datosPersonales.apellido,
+                      datosPersonales.correo,
+                      datosPersonales.telefono,
+                      datosPersonales.fechaNacimiento,
+                      userTextController.text,
+                      passWordTextController.text,
+                      imagenPerfilUrl,
+                    );
+
+                    Navigator.restorablePushNamed(context, 'login');
+                  } catch (e) {
+                    // Manejar el error de registro
+                    print('Error al registrar el usuario: $e');
+                    // Mostrar un mensaje de error al usuario
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text('Error'),
+                        content: Text(
+                            'Ocurrió un error al registrar el usuario. Por favor, inténtalo de nuevo.'),
+                        actions: [
+                          TextButton(
+                            onPressed: () =>
+                                Navigator.pushNamed(context, 'home'),
+                            child: Text('OK'),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                } else {
+                  // Manejar el caso en que datosPersonales sea nulo
+                  print('Los datos personales no están completos');
+                  // Mostrar un mensaje de error al usuario
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text('Error'),
+                      content: Text(
+                          'Por favor, completa todos los datos personales antes de registrarte.'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text('OK'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              }
+            },
+            text: 'Registrar',
           ),
-        );
-      }
-    }
-  },
-  text: 'Registrar',
-),
           const SizedBox(height: 30),
         ],
       ),

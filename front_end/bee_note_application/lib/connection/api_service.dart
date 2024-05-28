@@ -94,6 +94,7 @@ class ApiService {
     String fechaNacimiento,
     String nombreUsuario,
     String password,
+    String? imagenPerfil,
   ) async {
     try {
       final response = await _dio.post(
@@ -108,6 +109,7 @@ class ApiService {
             'telefono': telefono,
             'correo': correo,
           },
+          if (imagenPerfil != null) 'imagenPerfilUrl': imagenPerfil, // Agrega la URL de la imagen de perfil aquí
         },
       );
 
@@ -166,15 +168,32 @@ class ApiService {
   static Future<void> updateImagenPerfilUrl(String imagenPerfilUrl) async {
     try {
       final accessToken = await getAccessToken();
-      await _dio.patch(
+      final response = await _dio.patch(
         '$baseUrl/usuario/',
-        data: {'imagen_perfil_url': imagenPerfilUrl},
+        data: {'imagenPerfil': imagenPerfilUrl},
         options: Options(
           headers: {'Authorization': 'Bearer $accessToken'},
         ),
       );
+      if (response.statusCode != 200) {
+        throw Exception('Error al actualizar la URL de la imagen de perfil');
+      }
     } catch (e) {
-      print('Error al actualizar la URL de la imagen de perfil: $e');
+      if (e is DioError) {
+        if (e.response?.statusCode == 401) {
+          // El token de acceso ha expirado o no es válido
+          // Puedes realizar acciones adicionales, como refrescar el token o redirigir al usuario a la pantalla de inicio de sesión
+          print(
+              'Token de acceso inválido. Por favor, inicia sesión nuevamente.');
+        } else {
+          // Otro tipo de error
+          print('Error al actualizar la URL de la imagen de perfil: $e');
+        }
+      } else {
+        // Error de conexión u otro tipo de error
+        print('Error al actualizar la URL de la imagen de perfil: $e');
+      }
+      throw Exception('Error al actualizar la URL de la imagen de perfil');
     }
   }
 
