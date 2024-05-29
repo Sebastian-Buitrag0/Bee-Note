@@ -6,10 +6,18 @@ from django.contrib.auth.models import Group
 from .models import Tipo, Prioridad, Estado, Persona, Usuario, Registro, Proyecto, Tarea, Recurso, UsuariosRegistro, RecursoProyecto, RecursoTarea, UsuarioTarea, GroupUsuarioProyecto
 
 class PersonaSerializer(serializers.ModelSerializer):
+    telefono = serializers.CharField()
+
     class Meta:
         model = Persona
         fields = '__all__'
         read_only_fields = ('id',)
+
+class RecursoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Recurso
+        fields = '__all__'
+        read_only_fields = ('id','fechaSubida','tamaño','contribuidor','link','tipo',)
 
 class EstadoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -31,10 +39,20 @@ class PrioridadSerializer(serializers.ModelSerializer):
 
 class UsuarioSerializer(serializers.ModelSerializer):
     datosPersonales = PersonaSerializer(many=False, read_only=True)
-    imagen_perfil_url = serializers.URLField(required = False)
+    imagenPerfil = RecursoSerializer(many=False ,read_only=True ,required = False)
+
     class Meta:
         model = Usuario
         fields = '__all__'
+        read_only_fields = ('id',)
+
+    def validate_password(self, value: str) -> str:
+        return make_password(value)
+    
+class UsuarioColabSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Usuario
+        fields = ['id','nombreUsuario']
         read_only_fields = ('id',)
 
     def validate_password(self, value: str) -> str:
@@ -63,16 +81,12 @@ class TareaSerializer(serializers.ModelSerializer):
 class ProyectoSerializer(serializers.ModelSerializer):
     estado = serializers.PrimaryKeyRelatedField(queryset=Estado.objects.all())
     tareas = TareaSerializer(many=True, read_only=True)
+    colaboradores = UsuarioSerializer(many=True, read_only=True)
 
     class Meta:
         model = Proyecto
         fields = '__all__'
         read_only_fields = ('id', 'fechaCreacion')
-class RecursoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Recurso
-        fields = '__all__'
-        read_only_fields = ('id','fechaSubida','tamaño','contribuidor','link','tipo',)
 
 class UsuariosRegistroSerializer(serializers.ModelSerializer):
     class Meta:
@@ -114,34 +128,32 @@ class GroupUsuarioProyectoSerializer(serializers.ModelSerializer):
         read_only_fields = ('id','idProyecto','idGroup','idUsuario',)
 
 class RegistroUsuarioSerializer(serializers.ModelSerializer):
-    imagePerfil = serializers.ImageField(write_only = True, required = False)
     datosPersonales = PersonaSerializer()
+    imagenPerfilUrl = serializers.URLField(required=False)
 
     class Meta:
         model = Usuario
-        fields = ['nombreUsuario', 'password', 'imagePerfil', 'datosPersonales']
+        fields = ['nombreUsuario', 'password', 'datosPersonales', 'imagenPerfilUrl']
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-        imagenPerfil = validated_data.pop('imagenPerfil', None)
         datos_personales = validated_data.pop('datosPersonales')
+        imagen_perfil_url = validated_data.pop('imagenPerfilUrl', None)
+
         persona = Persona.objects.create(**datos_personales)
         usuario = Usuario.objects.create(datosPersonales=persona, **validated_data)
         usuario.set_password(validated_data['password'])
         usuario.save()
 
-        if imagenPerfil:
-            imgbb_url = self.upload_image_to_imgbb(imagenPerfil)
-            if imgbb_url:
-                recurso = Recurso(
-                    nombre=imagenPerfil.name,
-                    tipo=imagenPerfil.content_type,
-                    url=imgbb_url,
-                    tamaño=imagenPerfil.size
-                )
-                recurso.save()
-                usuario.imagenPerfil = recurso
-                usuario.save()
+        if imagen_perfil_url:
+            recurso = Recurso.objects.create(
+                nombre=f"Imagen de perfil de {usuario.nombreUsuario}",
+                tipo="imagen",
+                url=imagen_perfil_url,
+                tamaño=0  # Puedes establecer un tamaño predeterminado o calcularlo si es necesario
+            )
+            usuario.imagenPerfil = recurso
+            usuario.save()
 
         return usuario
 

@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from .models import (Persona, Usuario, Registro, Proyecto, Tarea, Recurso, Estado, Tipo, Prioridad, 
                      UsuariosRegistro, RecursoProyecto, RecursoTarea, UsuarioTarea, GroupUsuarioProyecto)
-from .serializers import (RegistroUsuarioSerializer, PersonaSerializer, UsuarioSerializer, RegistroSerializer, 
+from .serializers import (RegistroUsuarioSerializer, PersonaSerializer, UsuarioColabSerializer, UsuarioSerializer, RegistroSerializer, 
                           GroupSerializer, ProyectoSerializer, TareaSerializer, RecursoSerializer, EstadoSerializer, 
                           TipoSerializer, PrioridadSerializer, UsuariosRegistroSerializer, RecursoProyectoSerializer, 
                           RecursoTareaSerializer, UsuarioTareaSerializer, GroupUsuarioProyectoSerializer)
@@ -20,13 +20,18 @@ from django.dispatch import receiver
 @api_view(['POST'])
 @authentication_classes([])
 @permission_classes([])
-def registro(request):
+def login(request):
     serializer = RegistroSerializer(data=request.data)
     if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        user = serializer.validated_data['user']
+        token, created = token.objects.get_or_create(user=user)
+        return Response({
+            'token': token.key,
+            'user_id': user.pk,
+            'username': user.nombreUsuario,
+            'imagen_perfil_url': user.imagenPerfil.url if user.imagenPerfil else None
+        })
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 @receiver(user_logged_in)
 def update_last_login(sender, user, request, **kwargs):
@@ -61,7 +66,10 @@ class ProyectoViewSet(viewsets.ModelViewSet):
         proyecto = self.get_object()
         usuario = self.request.user
         if usuario.has_perm('app_name.change_proyecto', proyecto):
-            serializer.save()
+            colaboradores_data = self.request.data.get('colaboradores', [])
+            colaboradores = Usuario.objects.filter(id__in=colaboradores_data)
+            proyecto = serializer.save()
+            proyecto.colaboradores.set(colaboradores)
         else:
             raise PermissionDenied('No tienes permiso para editar este proyecto')
 
@@ -146,7 +154,7 @@ class RegistroUsuarioView(generics.CreateAPIView):
 
 
 class UsuariosPorInicialView(generics.ListAPIView):
-    serializer_class = UsuarioSerializer
+    serializer_class = UsuarioColabSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):

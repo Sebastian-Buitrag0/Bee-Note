@@ -44,7 +44,7 @@ class Recurso(models.Model):
     fechaSubida = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.nombre+' - '+self.tipo+' - '+self.contribuidor.nombreUsuario
+        return f"{self.nombre} - {self.tipo}"
 
     
 class Usuario(AbstractBaseUser,PermissionsMixin):
@@ -103,6 +103,7 @@ class Proyecto(models.Model):
     fechaCreacion = models.DateTimeField(auto_now_add=True)
     fechaInicio = models.DateTimeField()
     fechaFin = models.DateTimeField()
+    colaboradores = models.ManyToManyField(Usuario, related_name='proyectos')
 
     def __str__(self):
         return self.nombre
