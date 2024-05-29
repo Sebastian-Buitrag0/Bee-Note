@@ -1,6 +1,5 @@
-import 'dart:convert';
-
 import 'package:bee_note_application/data/user.dart';
+import 'package:bee_note_application/data/user_id_nombre.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:bee_note_application/data/project.dart';
@@ -112,7 +111,9 @@ class ApiService {
             'telefono': telefono,
             'correo': correo,
           },
-          if (imagenPerfil != null) 'imagenPerfilUrl': imagenPerfil, // Agrega la URL de la imagen de perfil aquí
+          if (imagenPerfil != null)
+            'imagenPerfilUrl':
+                imagenPerfil, // Agrega la URL de la imagen de perfil aquí
         },
       );
 
@@ -136,6 +137,7 @@ class ApiService {
     DateTime fechaInicio,
     DateTime fechaFin,
     int estado,
+    List<int> colaboradores,
   ) async {
     try {
       final accessToken = await getAccessToken();
@@ -147,6 +149,7 @@ class ApiService {
           'fechaInicio': fechaInicio.toIso8601String(),
           'fechaFin': fechaFin.toIso8601String(),
           'estado': estado,
+          'colaboradores': colaboradores
         },
         options: Options(
           headers: {'Authorization': 'Bearer $accessToken'},
@@ -266,28 +269,85 @@ class ApiService {
     }
   }
 
-  static Future<List<User>> getUsuario() async{
+  static Future<List<User>> getUsuario() async {
     try {
       final accessToken = await getAccessToken();
+      print('Token de acceso: $accessToken');
       final response = await _dio.get(
         '$baseUrl/usuario',
         options: Options(
           headers: {'Authorization': 'Bearer $accessToken'},
-        )
+        ),
       );
-      if(response.statusCode == 200){
+      if (response.statusCode == 200) {
         final userData = response.data as List<dynamic>;
         return userData.map((json) => User.fromJson(json)).toList();
       } else {
-        throw Exception('Error al obtener a l usuario');
+        throw Exception('Error al obtener al usuario');
       }
     } on DioError catch (e) {
       if (e.response != null) {
         throw Exception(
-            'Error al obtener los proyectos: ${e.response?.data['detail']}');
+            'Error al obtener al usuario: ${e.response?.data['detail']}');
       } else {
         throw Exception('Error al conectar con el servidor');
       }
     }
   }
+
+static Future<List<UserIdNombre>> getUsuariosDisponibles(String inicial) async {
+  try {
+    final accessToken = await getAccessToken();
+    final response = await _dio.get(
+      '$baseUrl/usuario/usuarios-inicial/',
+      queryParameters: {'inicial': inicial},
+      options: Options(
+        headers: {'Authorization': 'Bearer $accessToken'},
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      final usuariosData = response.data as List<dynamic>;
+      return usuariosData.map((json) => UserIdNombre.fromJson(json)).toList();
+    } else {
+      throw Exception('Error al obtener los usuarios disponibles');
+    }
+  } catch (e) {
+    print('Error al obtener los usuarios disponibles: $e');
+    throw Exception('Error al obtener los usuarios disponibles');
+  }
+}
+
+
+static Future<void> createGrupoUsuarioProyecto(
+    int idProyecto, int idUsuario, int idGroup) async {
+  try {
+    final accessToken = await getAccessToken();
+    final response = await _dio.post(
+      '$baseUrl/groupusuarioproyecto/',
+      data: {
+        'idProyecto': idProyecto,
+        'idUsuario': idUsuario,
+        'idGroup': idGroup,
+      },
+      options: Options(
+        headers: {'Authorization': 'Bearer $accessToken'},
+      ),
+    );
+
+    if (response.statusCode == 201) {
+      print('Grupo de usuario y proyecto creado exitosamente');
+    } else {
+      throw Exception('Error al crear el grupo de usuario y proyecto');
+    }
+  } on DioError catch (e) {
+    if (e.response != null) {
+      throw Exception(
+          'Error al crear el grupo de usuario y proyecto: ${e.response?.data['detail']}');
+    } else {
+      throw Exception('Error al conectar con el servidor');
+    }
+  }
+}
+
 }

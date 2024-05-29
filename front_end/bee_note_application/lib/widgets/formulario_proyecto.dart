@@ -1,4 +1,5 @@
 import 'package:bee_note_application/connection/api_service.dart';
+import 'package:bee_note_application/data/user.dart';
 import 'package:flutter/material.dart';
 
 import 'dart:io';
@@ -32,8 +33,16 @@ class _FormProyetcStaet extends State<FormProyect> {
   final starDateController = TextEditingController();
   final endDateController = TextEditingController();
 
+  List<User> allUserSelected = [];
+
   Uint8List? _image;
   File? selectedImage;
+
+   @override
+    void initState() {
+      super.initState();
+      allUserSelected = [];
+    }
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +68,14 @@ class _FormProyetcStaet extends State<FormProyect> {
 
           // Agregar participantes
           _ParticipantButton(
-            onTap: () => Navigator.pushNamed(context, 'collaborator'),
+            onTap: () async {
+              final result = await Navigator.pushNamed(context, 'collaborator');
+              if (result != null && result is List<User>) {
+                setState(() {
+                  allUserSelected.addAll(result);
+                });
+              }
+            },
           ),
 
           _BuildSelectedDate(
@@ -81,6 +97,8 @@ class _FormProyetcStaet extends State<FormProyect> {
     print('Guardar');
     if (_formKey.currentState!.validate()) {
       try {
+        final collaboratorIds = allUserSelected.map((user) => user.id).toList();
+        // print('los colaboradores: $collaboratorIds');
         // Llamar al método createProyecto de ApiService
         await ApiService.createProyecto(
           projectNamwController.text,
@@ -88,6 +106,7 @@ class _FormProyetcStaet extends State<FormProyect> {
           DateTime.parse("2003-03-03"),
           DateTime.parse("2003-03-03"),
           1, // Aquí puedes asignar el ID del estado deseado
+          collaboratorIds
         );
         // Proyecto creado exitosamente
         ScaffoldMessenger.of(context).showSnackBar(
@@ -355,8 +374,8 @@ class _BuildSelectedImage extends StatelessWidget {
 }
 
 class _ParticipantButton extends StatelessWidget {
-  final VoidCallback onTap;
-  
+  final Future<void> Function() onTap;
+
   const _ParticipantButton({
     required this.onTap,
   });
@@ -382,7 +401,6 @@ class _ParticipantButton extends StatelessWidget {
               ),
             ],
           ),
-          
           child: const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -394,11 +412,9 @@ class _ParticipantButton extends StatelessWidget {
                   color: Color.fromARGB(255, 130, 130, 130),
                 ),
               ),
-
-              Icon(Icons.person_add_alt_sharp)
+              Icon(Icons.person_add_alt_sharp),
             ],
           ),
-
         ),
       ),
     );

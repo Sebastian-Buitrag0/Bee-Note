@@ -190,7 +190,6 @@ class _RegisterState extends State<RegisterPage2> {
 
       // Crear un objeto Recurso con los datos de la imagen
       final recurso = Recurso(
-        id: 0, // Asigna un valor adecuado para el ID
         nombre: 'Nombre de la imagen',
         tipo: 'imagen',
         url: imageUrl,

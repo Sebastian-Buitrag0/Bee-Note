@@ -1,5 +1,4 @@
 class Recurso {
-    int id;
     String nombre;
     String tipo;
     String url;
@@ -7,7 +6,6 @@ class Recurso {
     DateTime fechaSubida;
 
     Recurso({
-        required this.id,
         required this.nombre,
         required this.tipo,
         required this.url,
@@ -16,7 +14,6 @@ class Recurso {
     });
 
     factory Recurso.fromJson(Map<String, dynamic> json) => Recurso(
-        id: json["id"],
         nombre: json["nombre"],
         tipo: json["tipo"],
         url: json["url"],
@@ -25,7 +22,6 @@ class Recurso {
     );
 
     Map<String, dynamic> toJson() => {
-        "id": id,
         "nombre": nombre,
         "tipo": tipo,
         "url": url,

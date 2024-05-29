@@ -1,4 +1,6 @@
-import 'package:bee_note_application/data/user.dart';
+import 'package:bee_note_application/connection/api_service.dart';
+import 'package:bee_note_application/data/user_id_nombre.dart';
+import 'package:bee_note_application/widgets/boton_hexagonal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -10,7 +12,28 @@ class CollaboratorPage extends StatefulWidget {
 }
 
 class _CollaboratorPageState extends State<CollaboratorPage> {
-  List<User> allUser = [];
+  List<UserIdNombre> allUser = [];
+  List<UserIdNombre> availableUsers = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _getUsuariosDisponibles('');
+  }
+
+  Future<void> _getUsuariosDisponibles(String inicial) async {
+    try {
+      List<UserIdNombre> usuarios;
+        usuarios = await ApiService.getUsuariosDisponibles(inicial);
+      setState(() {
+        availableUsers = usuarios;
+      });
+    } catch (e) {
+      print('Error al obtener los usuarios disponibles: $e');
+      // Maneja el error de acuerdo a tus necesidades
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -29,13 +52,19 @@ class _CollaboratorPageState extends State<CollaboratorPage> {
         centerTitle: true,
         backgroundColor: const Color(0xFFFED430),
         iconTheme: const IconThemeData(color: Colors.white, size: 45),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context, allUser);
+          },
+        ),
       ),
       body: ListView.builder(
         itemCount: allUser.length,
         itemBuilder: (context, index) {
           final user = allUser[index];
           return Slidable(
-            key: Key(user.datosPersonales.nombre),
+            key: Key(user.nombreUsuario),
             endActionPane: ActionPane(
               motion: const StretchMotion(),
               dismissible: DismissiblePane(
@@ -54,6 +83,13 @@ class _CollaboratorPageState extends State<CollaboratorPage> {
           );
         },
       ),
+      floatingActionButton: HexagonalButton(
+        onTap: () => _showSearchBar(context),
+        iconData: Icons.add,
+        sizewidth: 90,
+        sizeHeight: 60,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
@@ -65,7 +101,7 @@ class _CollaboratorPageState extends State<CollaboratorPage> {
 
     _showSnackBar(
       context,
-      '${user.datosPersonales.nombre} fue eliminado',
+      '${user.nombreUsuario} fue eliminado',
       Colors.red.shade600,
     );
   }
@@ -78,7 +114,7 @@ class _CollaboratorPageState extends State<CollaboratorPage> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  Padding buildUsreListTile(User user) {
+  Padding buildUsreListTile(UserIdNombre user) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Container(
@@ -111,7 +147,7 @@ class _CollaboratorPageState extends State<CollaboratorPage> {
                 }
               },
               title: Text(
-                user.datosPersonales.nombre,
+                user.nombreUsuario,
                 style: const TextStyle(
                   fontFamily: 'Letters_for_Learners',
                   fontSize: 30,
@@ -130,12 +166,73 @@ class _CollaboratorPageState extends State<CollaboratorPage> {
               ),
               leading: CircleAvatar(
                 radius: 30,
-                child: Text(user.datosPersonales.nombre[0]),
+                child: Text(user.nombreUsuario[0].toUpperCase()),
               ),
             );
           },
         ),
       ),
+    );
+  }
+
+  void _showSearchBar(BuildContext context) {
+    String searchQuery = '';
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height / 2,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      decoration: InputDecoration(
+                        labelText: 'Buscar usuario',
+                        prefixIcon: const Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      onChanged: (value) {
+                        setModalState(() {
+                          searchQuery = value;
+                        });
+                        _getUsuariosDisponibles(searchQuery);
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    Expanded(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: availableUsers.length,
+                        itemBuilder: (context, index) {
+                          final user = availableUsers[index];
+                          return ListTile(
+                            title: Text(user.nombreUsuario),
+                            subtitle: Text(user.nombreUsuario),
+                            // todo: modificado
+                            onTap: () {
+                                setState(() {
+                                  allUser.add(user);
+                                });
+                              },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

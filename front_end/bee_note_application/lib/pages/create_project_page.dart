@@ -2,6 +2,7 @@ import 'package:bee_note_application/widgets/formulario_proyecto.dart';
 import 'package:flutter/material.dart';
 
 class CreateProjectScreen extends StatelessWidget {
+
   const CreateProjectScreen({super.key});
 
   @override

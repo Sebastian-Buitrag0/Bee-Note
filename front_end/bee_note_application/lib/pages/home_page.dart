@@ -1,11 +1,10 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:bee_note_application/data/project.dart';
 import 'package:bee_note_application/pages/task_page.dart';
-import 'package:bee_note_application/providers/user_provider.dart';
 import 'package:bee_note_application/ui/bottom_tap_bar.dart';
 import 'package:bee_note_application/widgets/widgsts.dart';
 import 'package:bee_note_application/connection/api_service.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -20,11 +19,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_){
-      _getProyectos();
-    });
+    _getProyectosPeriodically();
   }
-
 
   Future<void> _getProyectos() async {
     try {
@@ -33,19 +29,21 @@ class _HomePageState extends State<HomePage> {
         _proyectos = proyectos;
       });
     } catch (e) {
-      // Maneja el error de acuerdo a tus necesidades
+      // Handle error according to your needs
       print('Error al obtener los proyectos: $e');
     }
   }
 
+  void _getProyectosPeriodically() {
+    _getProyectos(); // Initial fetch
+    // Poll for updates every 30 seconds
+    Timer.periodic(Duration(seconds: 10), (timer) {
+      _getProyectos();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-
-    // final userProvider = Provider.of<UserProvider>(context);
-    // final nombreUsuario = userProvider.nombreUsuario; 
-    // final password = userProvider.password;
-    // final imagenPerfilUrl = userProvider.imagenPerfilUrl;
-
     return Scaffold(
       backgroundColor: const Color(0xFFF0F0F0),
       drawer: const SideMenu(),
@@ -95,12 +93,10 @@ class _HomePageState extends State<HomePage> {
         itemCount: _proyectos.length,
         itemBuilder: (BuildContext context, int index) {
           final project = _proyectos[index];
-          print(_proyectos[0].nombre);
           return GestureDetector(
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => TaskPage(project: project)),
-              
             ),
             child: ProjectCard(project: project),
           );
@@ -121,8 +117,8 @@ class _HomePageState extends State<HomePage> {
         onTap: () async {
           // Lógica para el botón hexagonal
           final result = await Navigator.pushNamed(context, 'create_project');
-          if(result == true){
-            _getProyectos();
+          if (result == true) {
+            // No necesitas actualizar manualmente, los cambios se reflejarán automáticamente
           }
         },
         iconData: Icons.add,
